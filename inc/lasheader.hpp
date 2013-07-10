@@ -37,7 +37,7 @@
 #ifndef LAS_HEADER_HPP
 #define LAS_HEADER_HPP
 
-#include "laslibrarydefinitions.hpp"
+#include "lasdefinitions.hpp"
 
 class ByteStreamIn;
 

@@ -35,15 +35,15 @@
   
 ===============================================================================
 */
-#ifndef LAS_LIBRARY_POINT_HPP
-#define LAS_LIBRARY_POINT_HPP
+#ifndef LAS_POINT_HPP
+#define LAS_POINT_HPP
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "laslibrarydefinitions.hpp"
+#include "lasdefinitions.hpp"
 
 class LASpoint
 {

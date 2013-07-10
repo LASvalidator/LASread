@@ -1,4 +1,4 @@
-# makefile for open source (LGPL) liblaslibrary.a
+# makefile for open source (LGPL) liblasread.a
 #
 #COPTS    = -g -Wall
 COPTS     = -O3 -Wall -Wno-deprecated -DNDEBUG -DUNORDERED
@@ -10,9 +10,9 @@ INCLUDE  = -I/usr/include/ -I../inc -I.
 
 OBJ_LAS = lasheader.o laspoint.o lasreader.o lasreadopener.o laswaveformreader.o lasutility.o laszip.o lasreadpoint.o lasreaditemcompressed_v1.o lasreaditemcompressed_v2.o integerdecompressor.o arithmeticdecoder.o arithmeticmodel.o
 
-all: liblaslibrary.a
+all: liblasread.a
 
-liblaslibrary.a: ${OBJ_LAS}
+liblasread.a: ${OBJ_LAS}
 	$(AR) $@ ${OBJ_LAS}
 	cp -p $@ ../lib
 
@@ -23,10 +23,10 @@ liblaslibrary.a: ${OBJ_LAS}
 	${COMPILER} ${BITS} -c ${COPTS} ${INCLUDE} $< -o $@
 
 clean:
-	rm -rf liblaslibrary.a
+	rm -rf liblasread.a
 	rm -rf *.o
 
 clobber:
-	rm -rf liblaslibrary.a
+	rm -rf liblasread.a
 	rm -rf *.o
 	rm -rf *~
