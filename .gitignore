@@ -1,0 +1,7 @@
+# Compile stuff #
+#################
+*.plg
+*.ncb
+*.opt
+Debug/
+Release/
