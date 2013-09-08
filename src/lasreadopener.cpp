@@ -149,19 +149,19 @@ BOOL LASreadOpener::reopen(LASreader* lasreader)
 LASwaveformreader* LASreadOpener::open_waveform(const LASheader* lasheader)
 {
   if ((lasheader->point_data_format != 4) && (lasheader->point_data_format != 5) && (lasheader->point_data_format != 9) && (lasheader->point_data_format != 10)) return 0;
-  if (lasheader->vlr_wave_packet_descr == 0) return 0;
+  if (lasheader->wave_packet_descriptor == 0) return 0;
   if (get_path() == 0) return 0;
   LASwaveformreader* waveformreader = new LASwaveformreader();
   if ((lasheader->global_encoding & 2) && (lasheader->start_of_waveform_data_packet_record > lasheader->offset_to_point_data))
   {
-    if (waveformreader->open(get_path(), lasheader->start_of_waveform_data_packet_record, lasheader->vlr_wave_packet_descr))
+    if (waveformreader->open(get_path(), lasheader->start_of_waveform_data_packet_record, lasheader->wave_packet_descriptor))
     {
       return waveformreader;
     }
   }
   else
   {
-    if (waveformreader->open(get_path(), 0, lasheader->vlr_wave_packet_descr))
+    if (waveformreader->open(get_path(), 0, lasheader->wave_packet_descriptor))
     {
       return waveformreader;
     }

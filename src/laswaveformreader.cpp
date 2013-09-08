@@ -54,7 +54,7 @@ LASwaveformreader::LASwaveformreader()
 
   size = 0;
   compressed = FALSE;
-  wave_packet_descr = 0;
+  wave_packet_descriptor = 0;
   file = 0;
   stream = 0;
   last_position = 0;
@@ -77,7 +77,7 @@ BOOL LASwaveformreader::is_compressed() const
   return compressed;
 }
 
-BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_packet_record, const LASvlr_wave_packet_descr * const * wave_packet_descr)
+BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_packet_record, const LASwave_packet_descriptor * const * wave_packet_descriptor)
 {
   if (file_name == 0)
   {
@@ -85,7 +85,7 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
     return FALSE;
   }
 
-  if (wave_packet_descr == 0)
+  if (wave_packet_descriptor == 0)
   {
     fprintf(stderr,"ERROR: wave packet descriptor pointer is zero\n");
     return FALSE;
@@ -98,9 +98,9 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
 
   for (i = 0; i < 256; i++)
   {
-    if (wave_packet_descr[i])
+    if (wave_packet_descriptor[i])
     {
-      compressed = compressed || (wave_packet_descr[i]->getCompressionType() > 0);
+      compressed = compressed || (wave_packet_descriptor[i]->getCompressionType() > 0);
     }
   }
 
@@ -157,7 +157,7 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
   }
 
   this->start_of_waveform_data_packet_record = start_of_waveform_data_packet_record;
-  this->wave_packet_descr = wave_packet_descr;
+  this->wave_packet_descriptor = wave_packet_descriptor;
 
   // attempt waveform descriptor cross-check
 
@@ -194,7 +194,7 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
         fprintf(stderr,"ERROR: cross-check - index %d of waveform descriptor %d out-of-range\n", index, i);
         return FALSE;
       }
-      if (wave_packet_descr[index] == 0)
+      if (wave_packet_descriptor[index] == 0)
       {
         fprintf(stderr,"WARNING: cross-check - waveform descriptor %d with index %d unknown\n", i, index);
         I32 dummy;
@@ -211,9 +211,9 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
         fprintf(stderr,"ERROR: reading compression of waveform descriptor %d\n", i);
         return FALSE;
       }
-      if (compression != wave_packet_descr[index]->getCompressionType())
+      if (compression != wave_packet_descriptor[index]->getCompressionType())
       {
-        fprintf(stderr,"ERROR: cross-check - compression %d %d of waveform descriptor %d with index %d is different\n", compression, wave_packet_descr[index]->getCompressionType(), i, index);
+        fprintf(stderr,"ERROR: cross-check - compression %d %d of waveform descriptor %d with index %d is different\n", compression, wave_packet_descriptor[index]->getCompressionType(), i, index);
         return FALSE;
       }
       U8 nbits;
@@ -222,9 +222,9 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
         fprintf(stderr,"ERROR: reading nbits of waveform descriptor %d\n", i);
         return FALSE;
       }
-      if (nbits != wave_packet_descr[index]->getBitsPerSample())
+      if (nbits != wave_packet_descriptor[index]->getBitsPerSample())
       {
-        fprintf(stderr,"ERROR: cross-check - nbits %d %d of waveform descriptor %d with index %d is different\n", nbits, wave_packet_descr[index]->getBitsPerSample(), i, index);
+        fprintf(stderr,"ERROR: cross-check - nbits %d %d of waveform descriptor %d with index %d is different\n", nbits, wave_packet_descriptor[index]->getBitsPerSample(), i, index);
         return FALSE;
       }
       U16 nsamples;
@@ -233,9 +233,9 @@ BOOL LASwaveformreader::open(const char* file_name, I64 start_of_waveform_data_p
         fprintf(stderr,"ERROR: reading nsamples of waveform descriptor %d\n", i);
         return FALSE;
       }
-      if (nsamples != wave_packet_descr[index]->getNumberOfSamples())
+      if (nsamples != wave_packet_descriptor[index]->getNumberOfSamples())
       {
-        fprintf(stderr,"ERROR: cross-check - nsamples %d %d of waveform descriptor %d with index %d is different\n", nsamples, wave_packet_descr[index]->getNumberOfSamples(), i, index);
+        fprintf(stderr,"ERROR: cross-check - nsamples %d %d of waveform descriptor %d with index %d is different\n", nsamples, wave_packet_descriptor[index]->getNumberOfSamples(), i, index);
         return FALSE;
       }
     }
@@ -262,21 +262,21 @@ BOOL LASwaveformreader::read_waveform(const LASpoint* point)
     return FALSE;
   }
 
-  nbits = wave_packet_descr[index]->getBitsPerSample();
+  nbits = wave_packet_descriptor[index]->getBitsPerSample();
   if ((nbits != 8) && (nbits != 16))
   {
     fprintf(stderr, "ERROR: waveform with %d bits per samples not supported yet\n", nbits);
     return FALSE;
   }
 
-  nsamples = wave_packet_descr[index]->getNumberOfSamples();
+  nsamples = wave_packet_descriptor[index]->getNumberOfSamples();
   if (nsamples == 0)
   {
     fprintf(stderr, "ERROR: waveform has no samples\n");
     return FALSE;
   }
 
-  temporal = wave_packet_descr[index]->getTemporalSpacing();
+  temporal = wave_packet_descriptor[index]->getTemporalSpacing();
   location = point->get_wave_packet_location();
 
   XYZt[0] = point->get_wave_packet_Xt();
@@ -302,7 +302,7 @@ BOOL LASwaveformreader::read_waveform(const LASpoint* point)
   I64 position = start_of_waveform_data_packet_record + point->get_wave_packet_offset();
   stream->seek(position);
 
-  if (wave_packet_descr[index]->getCompressionType() == 0)
+  if (wave_packet_descriptor[index]->getCompressionType() == 0)
   {
     try { stream->getBytes(samples, size); } catch(...)
     {
