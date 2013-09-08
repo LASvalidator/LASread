@@ -53,14 +53,14 @@ void LASheader::clean()
     }
     free(vlrs);
     vlrs = 0;
-    vlr_geo_keys = 0;
-    vlr_geo_key_entries = 0;
-    vlr_geo_double_params = 0;
-    vlr_geo_ascii_params = 0;
-    vlr_geo_ogc_wkt = 0;
-    vlr_classification = 0;
-    if (vlr_wave_packet_descr) delete [] vlr_wave_packet_descr;
-    vlr_wave_packet_descr = 0;
+    geokeys = 0;
+    geokey_entries = 0;
+    geokey_double_params = 0;
+    geokey_ascii_params = 0;
+    ogc_wkt = 0;
+    classification = 0;
+    if (wave_packet_descriptor) delete [] wave_packet_descriptor;
+    wave_packet_descriptor = 0;
     number_of_variable_length_records = 0;
   }
   if (evlrs)
@@ -543,58 +543,71 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
         {
           if (vlrs[i].record_id == 34735) // GeoKeyDirectoryTag
           {
-            if (vlr_geo_keys)
+            if (geokeys)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: variable length records contain more than one GeoKeyDirectoryTag\n");
+              fprintf(stderr,"WARNING: variable length records contain more than one GeoKeyDirectory\n");
             }
-            vlr_geo_keys = (LASvlr_geo_keys*)vlrs[i].data;
+            geokeys = (LASgeokeys*)vlrs[i].data;
 
             // check variable header geo keys contents
 
-            if (vlr_geo_keys->key_directory_version != 1)
+            if (geokeys->key_directory_version != 1)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: wrong vlr_geo_keys->key_directory_version: %d != 1\n",vlr_geo_keys->key_directory_version);
+              fprintf(stderr,"WARNING: wrong geokeys->key_directory_version: %d != 1\n",geokeys->key_directory_version);
             }
-            if (vlr_geo_keys->key_revision != 1)
+            if (geokeys->key_revision != 1)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: wrong vlr_geo_keys->key_revision: %d != 1\n",vlr_geo_keys->key_revision);
+              fprintf(stderr,"WARNING: wrong geokeys->key_revision: %d != 1\n",geokeys->key_revision);
             }
-            if (vlr_geo_keys->minor_revision != 0)
+            if (geokeys->minor_revision != 0)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: wrong vlr_geo_keys->minor_revision: %d != 0\n",vlr_geo_keys->minor_revision);
+              fprintf(stderr,"WARNING: wrong geokeys->minor_revision: %d != 0\n",geokeys->minor_revision);
             }
-            vlr_geo_key_entries = (LASvlr_key_entry*)&vlr_geo_keys[1];
+            geokey_entries = (LASgeokey_entry*)&geokeys[1];
+            if (vlrs[i].record_length_after_header != ((geokeys->number_of_keys+1)*8))
+            {
+              success = FALSE;
+              fprintf(stderr,"WARNING: payload size of %u for GeoKey VLR cannot hold %u + 1 geokey entries\n", (U32)vlrs[i].record_length_after_header, geokeys->number_of_keys);
+            }
           }
           else if (vlrs[i].record_id == 34736) // GeoDoubleParamsTag
           {
-            if (vlr_geo_double_params)
+            if (geokey_double_params)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: variable length records contain more than one GeoDoubleParamsTag\n");
+              fprintf(stderr,"WARNING: variable length records contain more than one GeoDoubleParams\n");
             }
-            vlr_geo_double_params = (F64*)vlrs[i].data;
+            geokey_double_params = (F64*)vlrs[i].data;
+            if ((vlrs[i].record_length_after_header % 8) != 0)
+            {
+              success = FALSE;
+              fprintf(stderr,"WARNING: payload size of %u for GeoDoubleParamsTag VLR is not a multiple of 8\n", (U32)vlrs[i].record_length_after_header);
+            }
+            geokey_double_params_num = vlrs[i].record_length_after_header / 8;
           }
           else if (vlrs[i].record_id == 34737) // GeoAsciiParamsTag
           {
-            if (vlr_geo_ascii_params)
+            if (geokey_ascii_params)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: variable length records contain more than one GeoAsciiParamsTag\n");
+              fprintf(stderr,"WARNING: variable length records contain more than one GeoAsciiParams\n");
             }
-            vlr_geo_ascii_params = (CHAR*)vlrs[i].data;
+            geokey_ascii_params = (CHAR*)vlrs[i].data;
+            geokey_ascii_params_num = vlrs[i].record_length_after_header;
           }
           else if (vlrs[i].record_id == 2112) // GeoOCGWKTParamsTag
           {
-            if (vlr_geo_ogc_wkt)
+            if (ogc_wkt)
             {
               success = FALSE;
-              fprintf(stderr,"WARNING: variable length records contain more than one GeoOCGWKTParamsTag\n");
+              fprintf(stderr,"WARNING: variable length records contain more than one OCG WKT\n");
             }
-            vlr_geo_ogc_wkt = (CHAR*)vlrs[i].data;
+            ogc_wkt = (CHAR*)vlrs[i].data;
+            ogc_wkt_num = vlrs[i].record_length_after_header;
           }
         }
         else
@@ -609,12 +622,12 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
         {
           if (vlrs[i].record_id == 0) // ClassificationLookup
           {
-            if (vlr_classification)
+            if (classification)
             {
               success = FALSE;
               fprintf(stderr,"WARNING: variable length records contain more than one ClassificationLookup\n");
             }
-            vlr_classification = (LASvlr_classification*)vlrs[i].data;
+            classification = (LASclassification*)vlrs[i].data;
           }
           else if (vlrs[i].record_id == 2) // Histogram
           {
@@ -630,17 +643,17 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
           {
             I32 idx = vlrs[i].record_id - 99;
 
-            if (vlr_wave_packet_descr == 0)
+            if (wave_packet_descriptor == 0)
             {
-              vlr_wave_packet_descr = new LASvlr_wave_packet_descr*[256];
-              for (j = 0; j < 256; j++) vlr_wave_packet_descr[j] = 0;
+              wave_packet_descriptor = new LASwave_packet_descriptor*[256];
+              for (j = 0; j < 256; j++) wave_packet_descriptor[j] = 0;
             }
-            if (vlr_wave_packet_descr[idx])
+            if (wave_packet_descriptor[idx])
             {
               success = FALSE;
               fprintf(stderr,"WARNING: variable length records defines wave packet descr %d more than once\n", idx);
             }
-            vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)vlrs[i].data;
+            wave_packet_descriptor[idx] = (LASwave_packet_descriptor*)vlrs[i].data;
           }
         }
         else
@@ -798,70 +811,70 @@ BOOL LASheader::load_evlrs(ByteStreamIn* stream)
           {
             if (evlrs[i].record_id == 34735) // GeoKeyDirectoryTag
             {
-              if (vlr_geo_keys)
+              if (geokeys)
               {
                 success = FALSE;
                 fprintf(stderr,"WARNING: variable length records contain more than one GeoKeyDirectoryTag\n");
               }
-              vlr_geo_keys = (LASvlr_geo_keys*)evlrs[i].data;
+              geokeys = (LASgeokeys*)evlrs[i].data;
 
               // check variable header geo keys contents
 
-              if (vlr_geo_keys->key_directory_version != 1)
+              if (geokeys->key_directory_version != 1)
               {
                 success = FALSE;
-                fprintf(stderr,"WARNING: wrong vlr_geo_keys->key_directory_version: %d != 1\n",vlr_geo_keys->key_directory_version);
+                fprintf(stderr,"WARNING: wrong geokeys->key_directory_version: %d != 1\n",geokeys->key_directory_version);
               }
-              if (vlr_geo_keys->key_revision != 1)
+              if (geokeys->key_revision != 1)
               {
                 success = FALSE;
-                fprintf(stderr,"WARNING: wrong vlr_geo_keys->key_revision: %d != 1\n",vlr_geo_keys->key_revision);
+                fprintf(stderr,"WARNING: wrong geokeys->key_revision: %d != 1\n",geokeys->key_revision);
               }
-              if (vlr_geo_keys->minor_revision != 0)
+              if (geokeys->minor_revision != 0)
               {
                 success = FALSE;
-                fprintf(stderr,"WARNING: wrong vlr_geo_keys->minor_revision: %d != 0\n",vlr_geo_keys->minor_revision);
+                fprintf(stderr,"WARNING: wrong geokeys->minor_revision: %d != 0\n",geokeys->minor_revision);
               }
-              vlr_geo_key_entries = (LASvlr_key_entry*)&vlr_geo_keys[1];
+              geokey_entries = (LASgeokey_entry*)&geokeys[1];
             }
             else if (evlrs[i].record_id == 34736) // GeoDoubleParamsTag
             {
-              if (vlr_geo_double_params)
+              if (geokey_double_params)
               {
                 success = FALSE;
                 fprintf(stderr,"WARNING: variable length records contain more than one GeoDoubleParamsTag\n");
               }
-              vlr_geo_double_params = (F64*)evlrs[i].data;
+              geokey_double_params = (F64*)evlrs[i].data;
             }
             else if (evlrs[i].record_id == 34737) // GeoAsciiParamsTag
             {
-              if (vlr_geo_ascii_params)
+              if (geokey_ascii_params)
               {
                 success = FALSE;
                 fprintf(stderr,"WARNING: variable length records contain more than one GeoAsciiParamsTag\n");
               }
-              vlr_geo_ascii_params = (CHAR*)evlrs[i].data;
+              geokey_ascii_params = (CHAR*)evlrs[i].data;
             }
             else if (evlrs[i].record_id == 2112) // GeoOCGWKTParamsTag
             {
-              if (vlr_geo_ogc_wkt)
+              if (ogc_wkt)
               {
                 success = FALSE;
                 fprintf(stderr,"WARNING: variable length records contain more than one GeoOCGWKTParamsTag\n");
               }
-              vlr_geo_ogc_wkt = (CHAR*)evlrs[i].data;
+              ogc_wkt = (CHAR*)evlrs[i].data;
             }
           }
           else if (strcmp(evlrs[i].user_id, "LASF_Spec") == 0)
           {
             if (evlrs[i].record_id == 0) // ClassificationLookup
             {
-              if (vlr_classification)
+              if (classification)
               {
                 success = FALSE;
                 fprintf(stderr,"WARNING: variable length records contain more than one ClassificationLookup\n");
               }
-              vlr_classification = (LASvlr_classification*)evlrs[i].data;
+              classification = (LASclassification*)evlrs[i].data;
             }
             else if (evlrs[i].record_id == 2) // Histogram
             {
@@ -877,17 +890,17 @@ BOOL LASheader::load_evlrs(ByteStreamIn* stream)
             {
               I32 idx = evlrs[i].record_id - 99;
 
-              if (vlr_wave_packet_descr == 0)
+              if (wave_packet_descriptor == 0)
               {
-                vlr_wave_packet_descr = new LASvlr_wave_packet_descr*[256];
-                for (j = 0; j < 256; j++) vlr_wave_packet_descr[j] = 0;
+                wave_packet_descriptor = new LASwave_packet_descriptor*[256];
+                for (j = 0; j < 256; j++) wave_packet_descriptor[j] = 0;
               }
-              if (vlr_wave_packet_descr[idx])
+              if (wave_packet_descriptor[idx])
               {
                 success = FALSE;
                 fprintf(stderr,"WARNING: extended variable length records defines wave packet descr %d more than once\n", idx);
               }
-              vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)evlrs[i].data;
+              wave_packet_descriptor[idx] = (LASwave_packet_descriptor*)evlrs[i].data;
             }
           }
         }
