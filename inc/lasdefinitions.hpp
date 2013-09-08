@@ -34,7 +34,7 @@
 #define LASREAD_VERSION_MAJOR    0
 #define LASREAD_VERSION_MINOR    0
 #define LASREAD_REVISION         0
-#define LASREAD_BUILD_DATE  130430
+#define LASREAD_BUILD_DATE  130909
 
 #include <stdio.h>
 #include <string.h>
@@ -456,7 +456,7 @@ public:
   U8* data;
 };
 
-class LASvlr_geo_keys
+class LASgeokeys
 {
 public:
   U16 key_directory_version;
@@ -465,7 +465,7 @@ public:
   U16 number_of_keys;
 };
 
-class LASvlr_key_entry
+class LASgeokey_entry
 {
 public:
   U16 key_id;
@@ -474,17 +474,17 @@ public:
   U16 value_offset;
 };
 
-class LASvlr_classification
+class LASclassification
 {
 public:
   U8 class_number;
   CHAR description[15];
 };
 
-class LASvlr_wave_packet_descr
+class LASwave_packet_descriptor
 {
 public:
-  LASvlr_wave_packet_descr() {clean();};
+  LASwave_packet_descriptor() {clean();};
   void clean() {memset(data, 0, 26);};
   inline U8 getBitsPerSample() const {return data[0];};
   inline U8 getCompressionType() const {return data[1];};

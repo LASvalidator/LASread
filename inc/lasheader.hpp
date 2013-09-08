@@ -85,13 +85,18 @@ public:
 
   LASvlr* vlrs;
   LASevlr* evlrs;
-  LASvlr_geo_keys* vlr_geo_keys;
-  LASvlr_key_entry* vlr_geo_key_entries;
-  F64* vlr_geo_double_params;
-  CHAR* vlr_geo_ascii_params;
-  CHAR* vlr_geo_ogc_wkt;
-  LASvlr_classification* vlr_classification;
-  LASvlr_wave_packet_descr** vlr_wave_packet_descr;
+
+  LASclassification* classification;
+  LASwave_packet_descriptor** wave_packet_descriptor;
+
+  LASgeokeys* geokeys;
+  LASgeokey_entry* geokey_entries;
+  U32 geokey_double_params_num;
+  F64* geokey_double_params;
+  U32 geokey_ascii_params_num;
+  CHAR* geokey_ascii_params;
+  U32 ogc_wkt_num;
+  CHAR* ogc_wkt;
 
 //#ifdef LASZIP_ENABLED
   LASzip* laszip;
