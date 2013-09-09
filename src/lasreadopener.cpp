@@ -82,9 +82,12 @@ LASreader* LASreadOpener::open()
       LASreader* lasreader = new LASreader();
       if (!lasreader->open(file_name, io_ibuffer_size))
       {
-        fprintf(stderr,"ERROR: cannot open lasreader with file name '%s'\n", file_name);
-        delete lasreader;
-        return 0;
+        if (!lasreader->header.fails)
+        {
+          fprintf(stderr,"ERROR: cannot open lasreader with file name '%s'\n", file_name);
+          delete lasreader;
+          return 0;
+        }
       }
       return lasreader;
     }
