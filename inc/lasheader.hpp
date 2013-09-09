@@ -111,6 +111,16 @@ public:
   BOOL load_vlrs(ByteStreamIn* stream);
   BOOL load_evlrs(ByteStreamIn* stream);
 
+  // keep track of fails and warnings
+
+  U32 fail_num;
+  CHAR** fails;
+  void add_fail(const CHAR* fail, const CHAR* note);
+
+  U32 warning_num;
+  CHAR** warnings;
+  void add_warning(const CHAR* warning, const CHAR* note);
+
   // convenience function
 
   const LASvlr* get_vlr(const char* user_id, U16 record_id) const;
