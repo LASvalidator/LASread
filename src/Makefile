@@ -8,12 +8,12 @@ AR  = ar rc
 
 INCLUDE  = -I/usr/include/ -I../inc -I.
 
-OBJ_LAS = lasheader.o laspoint.o lasreader.o lasreadopener.o laswaveformreader.o lasutility.o laszip.o lasreadpoint.o lasreaditemcompressed_v1.o lasreaditemcompressed_v2.o integerdecompressor.o arithmeticdecoder.o arithmeticmodel.o
+OBJ = lasheader.o laspoint.o lasreader.o lasreadopener.o laswaveformreader.o lasutility.o laszip.o lasreadpoint.o lasreaditemcompressed_v1.o lasreaditemcompressed_v2.o integerdecompressor.o arithmeticdecoder.o arithmeticmodel.o
 
 all: liblasread.a
 
-liblasread.a: ${OBJ_LAS}
-	$(AR) $@ ${OBJ_LAS}
+liblasread.a: ${OBJ}
+	$(AR) $@ ${OBJ}
 	cp -p $@ ../lib
 
 .cpp.o:
