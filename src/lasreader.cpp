@@ -157,12 +157,12 @@ BOOL LASreader::open(ByteStreamIn* stream)
 
   if (header.laszip)
   {
-    if (!point.init(&header, header.laszip->num_items, header.laszip->items)) return FALSE;
+    if (!point.init(&header, header.laszip->num_items, header.laszip->items, 0, &header)) return FALSE;
     if (!reader->setup(header.laszip->num_items, header.laszip->items, header.laszip)) return FALSE;
   }
   else
   {
-    if (!point.init(&header, header.point_data_format, header.point_data_record_length)) return FALSE;
+    if (!point.init(&header, header.point_data_format, header.point_data_record_length, 0, &header)) return FALSE;
     if (!reader->setup(point.num_items, point.items)) return FALSE;
   }
   if (!reader->init(stream)) return FALSE;

@@ -31,7 +31,7 @@
 
 #include "laspoint.hpp"
 
-BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer)
+BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer, LASerror* error)
 {
   // clean the point
 
@@ -41,13 +41,35 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
 
   if (!LASzip().setup(&num_items, &items, point_type, point_size))
   {
-    fprintf(stderr,"ERROR: unknown point type %d with point size %d\n", (I32)point_type, (I32)point_size);
+    if (error)
+    {
+      error->add_fail("point type or size", LASzip().get_error());
+    }
+    else
+    {
+      fprintf(stderr,"ERROR %s\n", LASzip().get_error());
+    }
     return FALSE;
   }
 
   // create point's item pointers
 
   point = new U8*[num_items];
+
+  if (point == 0)
+  {
+    if (error)
+    {
+      CHAR note[512];
+      sprintf(note, "error allocating %d bytes for %d item pointers", (I32)num_items*sizeof(U8*), (I32)num_items);
+      error->add_fail("memory", note);
+    }
+    else
+    {
+      fprintf(stderr, "ERROR: allocating %d bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
+    }
+    return FALSE;
+  }
 
   U16 i;
   for (i = 0; i < num_items; i++)
@@ -78,9 +100,33 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
     case LASitem::BYTE:
       number_of_extra_bytes = items[i].size;
       extra_bytes = new U8[number_of_extra_bytes];
+      if (extra_bytes == 0)
+      {
+        if (error)
+        {
+          CHAR note[512];
+          sprintf(note, "error allocating %d bytes for item %d extra_bytes", (I32)extra_bytes, (I32)i);
+          error->add_fail("memory", note);
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: allocating %d bytes for item %d extra_bytes\n", (I32)extra_bytes, (I32)i);
+        }
+        return FALSE;
+      }
       point[i] = extra_bytes;
       break;
     default:
+      if (error)
+      {
+        CHAR note[512];
+        sprintf(note, "error item %d has unknown type %d", (I32)i, (I32)items[i].type);
+        error->add_fail("internal", note);
+      }
+      else
+      {
+        fprintf(stderr, "ERROR: item %d has unknown type %d", (I32)i, (I32)items[i].type);
+      }
       return FALSE;
     }
   }
@@ -89,7 +135,7 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
   return TRUE;
 };
 
-BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer)
+BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer, LASerror* error)
 {
   U32 i,e;
 
@@ -99,11 +145,43 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LA
 
   // create item description
 
-  this->num_items = num_items;
   if (this->items) delete [] this->items;
   this->items = new LASitem[num_items];
+
+  if (this->items == 0)
+  {
+    if (error)
+    {
+      CHAR note[512];
+      sprintf(note, "error allocating %d bytes for %d LASitems", (I32)num_items*sizeof(LASitem), (I32)num_items);
+      error->add_fail("memory", note);
+    }
+    else
+    {
+      fprintf(stderr, "ERROR: allocating %d bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
+    }
+    return FALSE;
+  }
+
   if (this->point) delete [] this->point;
   this->point = new U8*[num_items];
+
+  if (this->point == 0)
+  {
+    if (error)
+    {
+      CHAR note[512];
+      sprintf(note, "error allocating %d bytes for %d item pointers", (I32)num_items*sizeof(U8*), (I32)num_items);
+      error->add_fail("memory", note);
+    }
+    else
+    {
+      fprintf(stderr, "ERROR: allocating %d bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
+    }
+    return FALSE;
+  }
+
+  this->num_items = num_items;
 
   for (i = 0, e = 0; i < num_items; i++)
   {
@@ -134,9 +212,33 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LA
     case LASitem::BYTE:
       number_of_extra_bytes = items[i].size;
       extra_bytes = new U8[number_of_extra_bytes];
+      if (extra_bytes == 0)
+      {
+        if (error)
+        {
+          CHAR note[512];
+          sprintf(note, "error allocating %d bytes for item %d extra_bytes", (I32)extra_bytes, (I32)i);
+          error->add_fail("memory", note);
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: allocating %d bytes for item %d extra_bytes\n", (I32)extra_bytes, (I32)i);
+        }
+        return FALSE;
+      }
       this->point[i] = extra_bytes;
       break;
     default:
+      if (error)
+      {
+        CHAR note[512];
+        sprintf(note, "error item %d has unknown type %d", (I32)i, (I32)items[i].type);
+        error->add_fail("internal", note);
+      }
+      else
+      {
+        fprintf(stderr, "ERROR: item %d has unknown type %d", (I32)i, (I32)items[i].type);
+      }
       return FALSE;
     }
   }
