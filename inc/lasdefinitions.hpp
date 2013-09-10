@@ -34,7 +34,7 @@
 #define LASREAD_VERSION_MAJOR    0
 #define LASREAD_VERSION_MINOR    0
 #define LASREAD_REVISION         0
-#define LASREAD_BUILD_DATE  130909
+#define LASREAD_BUILD_DATE  130910
 
 #include <stdio.h>
 #include <string.h>
@@ -62,6 +62,79 @@ public:
   inline F32 getZt() const { return ((F32*)&(data[25]))[0]; };
 private:
   U8 data[29];
+};
+
+class LASerror
+{
+public:
+  LASerror()
+  {
+    memset((void*)this, 0, sizeof(LASerror));
+  };
+
+  ~LASerror()
+  {
+    clean();
+  };
+
+  void clean()
+  {
+    if (fail_num)
+    {
+      U32 i;
+      for (i = 0; i < fail_num; i++)
+      {
+        free(fails[i]);
+      }
+      free(fails);
+      fails = 0;
+      fail_num = 0;
+    }
+    if (warning_num)
+    {
+      U32 i;
+      for (i = 0; i < warning_num; i++)
+      {
+        free(warnings[i]);
+      }
+      free(warnings);
+      warnings = 0;
+      warning_num = 0;
+    }
+    memset((void*)this, 0, sizeof(LASerror));
+  };
+
+  void add_fail(const CHAR* fail, const CHAR* note)
+  {
+    if (fail)
+    {
+      fails = (CHAR**)realloc(fails, sizeof(CHAR*)*(fail_num+2));
+      fails[fail_num] = strdup(fail);
+      fail_num++;
+      fails[fail_num] = strdup(note);
+      fail_num++;
+    }
+  };
+
+  void add_warning(const CHAR* warning, const CHAR* note)
+  {
+    if (warning)
+    {
+      warnings = (CHAR**)realloc(warnings, sizeof(CHAR*)*(warning_num+2));
+      warnings[warning_num] = strdup(warning);
+      warning_num++;
+      warnings[warning_num] = strdup(note);
+      warning_num++;
+    }
+  };
+
+  // keep track of fails and warnings
+
+  U32 fail_num;
+  CHAR** fails;
+
+  U32 warning_num;
+  CHAR** warnings;
 };
 
 class LASquantizer

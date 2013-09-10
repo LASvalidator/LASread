@@ -43,7 +43,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "lasdefinitions.hpp"
+#include "lasheader.hpp"
 
 class LASpoint
 {
@@ -119,8 +119,8 @@ public:
 
   // these functions set the desired point format
 
-  BOOL init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0);
-  BOOL init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer=0);
+  BOOL init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0, LASerror* error=0);
+  BOOL init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer=0, LASerror* error=0);
 
   // convenience function
 

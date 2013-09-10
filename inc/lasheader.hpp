@@ -41,7 +41,7 @@
 
 class ByteStreamIn;
 
-class LASheader : public LASquantizer, public LASattributer
+class LASheader : public LASquantizer, public LASattributer, public LASerror
 {
 public:
   CHAR file_signature[4];
@@ -110,16 +110,6 @@ public:
   BOOL load_header(ByteStreamIn* stream);
   BOOL load_vlrs(ByteStreamIn* stream);
   BOOL load_evlrs(ByteStreamIn* stream);
-
-  // keep track of fails and warnings
-
-  U32 fail_num;
-  CHAR** fails;
-  void add_fail(const CHAR* fail, const CHAR* note);
-
-  U32 warning_num;
-  CHAR** warnings;
-  void add_warning(const CHAR* warning, const CHAR* note);
 
   // convenience function
 
