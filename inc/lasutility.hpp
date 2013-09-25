@@ -46,6 +46,12 @@ public:
   I32 min_Y;
   I32 max_Z;
   I32 min_Z;
+  U16 min_intensity;
+  U16 max_intensity;
+  U16 min_point_source_ID;
+  U16 max_point_source_ID;
+  I8 min_scan_angle_rank;
+  I8 max_scan_angle_rank;
   F64 max_gps_time;
   F64 min_gps_time;
   U16 max_R;

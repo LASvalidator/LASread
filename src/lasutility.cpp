@@ -36,18 +36,7 @@
 
 LASinventory::LASinventory()
 {
-  U32 i;
-  number_of_point_records = 0;
-  for (i = 0; i < 16; i++) number_of_points_by_return[i] = 0;
-  for (i = 0; i < 16; i++) number_of_returns_of_given_pulse[i] = 0;
-  max_X = min_X = 0;
-  max_Y = min_Y = 0;
-  max_Z = min_Z = 0;
-  min_gps_time = max_gps_time = 0.0;
-  max_R = min_R = 0;
-  max_G = min_G = 0;
-  max_B = min_B = 0;
-  max_I = min_I = 0;
+  memset(this, 0, sizeof(LASinventory));
   first = TRUE;
 }
 
@@ -61,6 +50,9 @@ BOOL LASinventory::add(const LASpoint* point)
     min_X = max_X = point->get_X();
     min_Y = max_Y = point->get_Y();
     min_Z = max_Z = point->get_Z();
+    min_intensity = max_intensity = point->get_intensity();
+    min_point_source_ID = max_point_source_ID = point->get_point_source_ID();
+    min_scan_angle_rank = max_scan_angle_rank = point->get_scan_angle_rank();
     min_gps_time = max_gps_time = point->get_gps_time();
     max_R = min_R = point->get_R();
     max_G = min_G = point->get_G();
@@ -76,6 +68,12 @@ BOOL LASinventory::add(const LASpoint* point)
     else if (point->get_Y() > max_Y) max_Y = point->get_Y();
     if (point->get_Z() < min_Z) min_Z = point->get_Z();
     else if (point->get_Z() > max_Z) max_Z = point->get_Z();
+    if (point->get_intensity() < min_intensity) min_intensity = point->get_intensity();
+    else if (point->get_intensity() > max_intensity) max_intensity = point->get_intensity();
+    if (point->get_point_source_ID() < min_point_source_ID) min_point_source_ID = point->get_point_source_ID();
+    else if (point->get_point_source_ID() > max_point_source_ID) max_point_source_ID = point->get_point_source_ID();
+    if (point->get_scan_angle_rank() < min_scan_angle_rank) min_scan_angle_rank = point->get_scan_angle_rank();
+    else if (point->get_scan_angle_rank() > max_scan_angle_rank) max_scan_angle_rank = point->get_scan_angle_rank();
     if (point->get_gps_time() < min_gps_time) min_gps_time = point->get_gps_time();
     else if (point->get_gps_time() > max_gps_time) max_gps_time = point->get_gps_time();
     if (point->get_R() < min_R) min_R = point->get_R();
