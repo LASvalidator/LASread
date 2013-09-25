@@ -325,7 +325,7 @@ BOOL LASreadOpener::add_file_name(const char* file_name, BOOL unique)
   {
     // find the path
     int len = strlen(file_name);
-    while (len && file_name[len] != '\\') len--;
+    while ((len > 0) && (file_name[len] != '\\') && (file_name[len] != '/')) len--;
     if (len)
     {
       len++;
