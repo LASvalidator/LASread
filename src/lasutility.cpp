@@ -45,6 +45,7 @@ BOOL LASinventory::add(const LASpoint* point)
   number_of_point_records++;
   number_of_points_by_return[point->get_return_number()]++;
   number_of_returns_of_given_pulse[point->get_number_of_returns_of_given_pulse()]++;
+  return_count_for_return_number[point->get_number_of_returns_of_given_pulse()][point->get_return_number()]++;
   if (first)
   {
     min_X = max_X = point->get_X();

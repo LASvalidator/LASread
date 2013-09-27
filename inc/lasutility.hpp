@@ -40,6 +40,7 @@ public:
   U64 number_of_point_records;
   U64 number_of_points_by_return[16];
   U64 number_of_returns_of_given_pulse[16];
+  U64 return_count_for_return_number[16][16];
   I32 max_X;
   I32 min_X;
   I32 max_Y;
