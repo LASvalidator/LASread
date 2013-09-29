@@ -48,7 +48,8 @@ public:
   BOOL add_file_name(const char* file_name, BOOL unique=FALSE);
   U32 get_file_name_number() const;
   void usage() const;
-  BOOL parse(int argc, char* argv[]);
+  BOOL parse(const int argc, char * const argv[]);
+  void set_piped(BOOL piped) { use_stdin = piped; };
   BOOL is_piped() const;
   BOOL is_active() const;
   LASreader* open();

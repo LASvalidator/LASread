@@ -31,9 +31,8 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LASREAD_VERSION_MAJOR    0
+#define LASREAD_VERSION_MAJOR    1
 #define LASREAD_VERSION_MINOR    0
-#define LASREAD_REVISION         0
 #define LASREAD_BUILD_DATE  130927
 
 #include <stdio.h>
@@ -44,9 +43,9 @@
 #include "mydefs.hpp"
 #include "laszip.hpp"
 
-#define LAS_LIBRARY_FORMAT_DEFAULT 0
-#define LAS_LIBRARY_FORMAT_LAS     1
-#define LAS_LIBRARY_FORMAT_LAZ     2
+#define LASREAD_FORMAT_DEFAULT 0
+#define LASREAD_FORMAT_LAS     1
+#define LASREAD_FORMAT_LAZ     2
 
 class LASwavepacket
 {
