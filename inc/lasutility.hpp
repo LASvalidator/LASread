@@ -53,6 +53,8 @@ public:
   U16 max_point_source_ID;
   I8 min_scan_angle_rank;
   I8 max_scan_angle_rank;
+  I16 min_scan_angle;
+  I16 max_scan_angle;
   F64 max_gps_time;
   F64 min_gps_time;
   U16 max_R;

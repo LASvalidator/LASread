@@ -33,7 +33,7 @@
 
 #define LASREAD_VERSION_MAJOR    1
 #define LASREAD_VERSION_MINOR    0
-#define LASREAD_BUILD_DATE  130927
+#define LASREAD_BUILD_DATE  131007
 
 #include <stdio.h>
 #include <string.h>

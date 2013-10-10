@@ -54,6 +54,7 @@ BOOL LASinventory::add(const LASpoint* point)
     min_intensity = max_intensity = point->get_intensity();
     min_point_source_ID = max_point_source_ID = point->get_point_source_ID();
     min_scan_angle_rank = max_scan_angle_rank = point->get_scan_angle_rank();
+    min_scan_angle = max_scan_angle = point->get_scan_angle();
     min_gps_time = max_gps_time = point->get_gps_time();
     max_R = min_R = point->get_R();
     max_G = min_G = point->get_G();
@@ -75,6 +76,8 @@ BOOL LASinventory::add(const LASpoint* point)
     else if (point->get_point_source_ID() > max_point_source_ID) max_point_source_ID = point->get_point_source_ID();
     if (point->get_scan_angle_rank() < min_scan_angle_rank) min_scan_angle_rank = point->get_scan_angle_rank();
     else if (point->get_scan_angle_rank() > max_scan_angle_rank) max_scan_angle_rank = point->get_scan_angle_rank();
+    if (point->get_scan_angle() < min_scan_angle) min_scan_angle = point->get_scan_angle();
+    else if (point->get_scan_angle() > max_scan_angle) max_scan_angle = point->get_scan_angle();
     if (point->get_gps_time() < min_gps_time) min_gps_time = point->get_gps_time();
     else if (point->get_gps_time() > max_gps_time) max_gps_time = point->get_gps_time();
     if (point->get_R() < min_R) min_R = point->get_R();

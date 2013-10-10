@@ -46,6 +46,7 @@ public:
   const char* get_directory();
   void set_file_name(const char* file_name, BOOL unique=FALSE);
   BOOL add_file_name(const char* file_name, BOOL unique=FALSE);
+  BOOL add_directory(const char* directory_name, BOOL recursive=FALSE);
   U32 get_file_name_number() const;
   void usage() const;
   BOOL parse(const int argc, char * const argv[]);

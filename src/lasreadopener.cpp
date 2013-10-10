@@ -278,6 +278,47 @@ BOOL LASreadOpener::add_file_name(const char* file_name, BOOL unique)
   }
   return r;
 }
+BOOL LASreadOpener::add_directory(const char* directory_name, BOOL recursive)
+{
+  BOOL r = FALSE;
+/*
+  HANDLE h;
+  WIN32_FIND_DATA info;
+  h = FindFirstFile(directory_name, &info);
+  if (h != INVALID_HANDLE_VALUE)
+  {
+    // find the path
+    int len = strlen(file_name);
+    while ((len > 0) && (file_name[len] != '\\') && (file_name[len] != '/')) len--;
+    if (len)
+    {
+      len++;
+      char full_file_name[512];
+      strncpy(full_file_name, file_name, len);
+	    do
+	    {
+        sprintf(&full_file_name[len], "%s", info.cFileName);
+        if (add_file_name_single(full_file_name, unique)) r = TRUE;
+  	  } while (FindNextFile(h, &info));
+    }
+    else
+    {
+      do
+      {
+        if (add_file_name_single(info.cFileName, unique)) r = TRUE;
+  	  } while (FindNextFile(h, &info));
+    }
+	  FindClose(h);
+  }
+*/
+  return r;
+}
+#else
+BOOL LASreadOpener::add_directory(const char* directory_name, BOOL recursive)
+{
+  BOOL r = FALSE;
+  return r;
+}
 #endif
 
 #ifdef _WIN32
