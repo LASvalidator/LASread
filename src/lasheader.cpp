@@ -708,7 +708,34 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
               add_fail("VLR", note);
               success = FALSE;
             }
+            if (vlrs[i].record_length_after_header != 26)
+            {
+              sprintf(note, "variable length record payload for wave packet descr %d is %d instead of 26 bytes\n", idx, (I32)vlrs[i].record_length_after_header);
+              add_fail("VLR", note);
+              success = FALSE;
+            }
+
             wave_packet_descriptor[idx] = (LASwave_packet_descriptor*)vlrs[i].data;
+            if ((wave_packet_descriptor[idx]->getBitsPerSample() != 8) && (wave_packet_descriptor[idx]->getBitsPerSample() != 16))
+            {
+              sprintf(note, "bits per sample for descriptor %d is %d instead of 8 or 16\n", idx, (I32)wave_packet_descriptor[idx]->getBitsPerSample());
+              add_warning("wave packet descriptor", note);
+            }
+            if (wave_packet_descriptor[idx]->getNumberOfSamples() == 0)
+            {
+              sprintf(note, "number of samples for descriptor %d is zero\n", idx);
+              add_warning("wave packet descriptor", note);
+            }
+            if (wave_packet_descriptor[idx]->getTemporalSpacing() == 0)
+            {
+              sprintf(note, "temporal spacing for descriptor %d is zero\n", idx);
+              add_warning("wave packet descriptor", note);
+            }
+          }
+          else
+          {
+            sprintf(note, "variable length records define LASF_Spec with unknown record ID %d", vlrs[i].record_id);
+            success = FALSE;
           }
         }
         else
