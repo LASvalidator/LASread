@@ -61,12 +61,12 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
     if (error)
     {
       CHAR note[512];
-      sprintf(note, "error allocating %d bytes for %d item pointers", (I32)num_items*sizeof(U8*), (I32)num_items);
+      sprintf(note, "error allocating %lu bytes for %d item pointers", (I32)num_items*sizeof(U8*), (I32)num_items);
       error->add_fail("memory", note);
     }
     else
     {
-      fprintf(stderr, "ERROR: allocating %d bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
+      fprintf(stderr, "ERROR: allocating %lu bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
     }
     return FALSE;
   }
@@ -105,12 +105,12 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
         if (error)
         {
           CHAR note[512];
-          sprintf(note, "error allocating %d bytes for item %d extra_bytes", (I32)extra_bytes, (I32)i);
+          sprintf(note, "error allocating %d bytes for item %d extra_bytes", (I32)number_of_extra_bytes, (I32)i);
           error->add_fail("memory", note);
         }
         else
         {
-          fprintf(stderr, "ERROR: allocating %d bytes for item %d extra_bytes\n", (I32)extra_bytes, (I32)i);
+          fprintf(stderr, "ERROR: allocating %d bytes for item %d extra_bytes\n", (I32)number_of_extra_bytes, (I32)i);
         }
         return FALSE;
       }
@@ -153,12 +153,12 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LA
     if (error)
     {
       CHAR note[512];
-      sprintf(note, "error allocating %d bytes for %d LASitems", (I32)num_items*sizeof(LASitem), (I32)num_items);
+      sprintf(note, "error allocating %lu bytes for %d LASitems", (I32)num_items*sizeof(LASitem), (I32)num_items);
       error->add_fail("memory", note);
     }
     else
     {
-      fprintf(stderr, "ERROR: allocating %d bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
+      fprintf(stderr, "ERROR: allocating %lu bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
     }
     return FALSE;
   }
@@ -171,12 +171,12 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LA
     if (error)
     {
       CHAR note[512];
-      sprintf(note, "error allocating %d bytes for %d item pointers", (I32)num_items*sizeof(U8*), (I32)num_items);
+      sprintf(note, "error allocating %lu bytes for %d item pointers", (I32)num_items*sizeof(U8*), (I32)num_items);
       error->add_fail("memory", note);
     }
     else
     {
-      fprintf(stderr, "ERROR: allocating %d bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
+      fprintf(stderr, "ERROR: allocating %lu bytes for %d item pointers\n", (I32)num_items*sizeof(U8*), (I32)num_items);
     }
     return FALSE;
   }
@@ -217,12 +217,12 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LA
         if (error)
         {
           CHAR note[512];
-          sprintf(note, "error allocating %d bytes for item %d extra_bytes", (I32)extra_bytes, (I32)i);
+          sprintf(note, "error allocating %d bytes for item %d extra_bytes", (I32)number_of_extra_bytes, (I32)i);
           error->add_fail("memory", note);
         }
         else
         {
-          fprintf(stderr, "ERROR: allocating %d bytes for item %d extra_bytes\n", (I32)extra_bytes, (I32)i);
+          fprintf(stderr, "ERROR: allocating %d bytes for item %d extra_bytes\n", (I32)number_of_extra_bytes, (I32)i);
         }
         return FALSE;
       }
