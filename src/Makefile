@@ -1,7 +1,7 @@
 # makefile for open source (LGPL) liblasread.a
 #
 #COPTS    = -g -Wall
-COPTS     = -O3 -Wall -Wno-deprecated -DNDEBUG -DUNORDERED
+COPTS     = -O3 -Wall -Wno-deprecated -DNDEBUG -DUNORDERED -DLASZIP_ENABLED
 COMPILER  = g++
 AR  = ar rc
 #BITS     = -64
