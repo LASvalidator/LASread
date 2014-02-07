@@ -493,6 +493,7 @@ public:
       free(extra_attribute_array_offsets); extra_attribute_array_offsets = 0;
       free(extra_attribute_sizes); extra_attribute_sizes = 0;
     }
+    return TRUE;
   }
 
   BOOL remove_extra_attribute(const char* name)
