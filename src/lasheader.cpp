@@ -382,7 +382,7 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
     vlrs = (LASvlr*)malloc(sizeof(LASvlr)*number_of_variable_length_records);
     if (vlrs == 0)
     {
-      sprintf(note, "error allocating %u bytes for %u VLRs", sizeof(LASvlr)*number_of_variable_length_records, number_of_variable_length_records);
+      sprintf(note, "error allocating %lu bytes for %u VLRs", sizeof(LASvlr)*number_of_variable_length_records, number_of_variable_length_records);
       add_fail("memory", note);
       return FALSE;
     }
@@ -764,7 +764,7 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
 
     if (user_data_after_header == 0)
     {
-      sprintf(note, "error allocating %u bytes for header.user_data_after_header", user_data_after_header);
+      sprintf(note, "error allocating %u bytes for header.user_data_after_header", user_data_after_header_size);
       add_fail("memory", note);
       return FALSE;
     }
@@ -834,7 +834,7 @@ BOOL LASheader::load_evlrs(ByteStreamIn* stream)
         evlrs = (LASevlr*)malloc(sizeof(LASevlr)*number_of_extended_variable_length_records);
         if (evlrs == 0)
         {
-          sprintf(note, "error allocating %u bytes for %u EVLRs", sizeof(LASevlr)*number_of_extended_variable_length_records, number_of_extended_variable_length_records);
+          sprintf(note, "error allocating %lu bytes for %u EVLRs", sizeof(LASevlr)*number_of_extended_variable_length_records, number_of_extended_variable_length_records);
           add_fail("memory", note);
           return FALSE;
         }
