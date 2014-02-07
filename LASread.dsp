@@ -157,10 +157,6 @@ SOURCE=.\src\arithmeticmodel.hpp
 # End Source File
 # Begin Source File
 
-SOURCE="C:\Program Files (x86)\Microsoft Visual Studio\VC98\Include\BASETSD.H"
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\bytestreamin.hpp
 # End Source File
 # Begin Source File

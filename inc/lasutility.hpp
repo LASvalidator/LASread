@@ -37,10 +37,10 @@ class LASinventory
 {
 public:
   BOOL is_active() const { return (first == FALSE); }; 
-  U64 number_of_point_records;
-  U64 number_of_points_by_return[16];
-  U64 number_of_returns_of_given_pulse[16];
-  U64 return_count_for_return_number[16][16];
+  I64 number_of_point_records;
+  I64 number_of_points_by_return[16];
+  I64 number_of_returns_of_given_pulse[16];
+  I64 return_count_for_return_number[16][16];
   I32 max_X;
   I32 min_X;
   I32 max_Y;
@@ -65,7 +65,16 @@ public:
   U16 min_B;
   U16 max_I;
   U16 min_I;
+  I64 xyz_fluff_10[3];
+  I64 xyz_fluff_100[3];
+  I64 xyz_fluff_1000[3];
   BOOL add(const LASpoint* point);
+  BOOL has_fluff() const { return has_fluff(0) || has_fluff(1) || has_fluff(2); };
+  BOOL has_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_10[i])); };
+  BOOL has_serious_fluff() const { return has_serious_fluff(0) || has_serious_fluff(1) || has_serious_fluff(2); };
+  BOOL has_serious_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_100[i])); };
+  BOOL has_very_serious_fluff() const { return has_very_serious_fluff(0) || has_very_serious_fluff(1) || has_very_serious_fluff(2); };
+  BOOL has_very_serious_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_1000[i])); };
   LASinventory();
 private:
   BOOL first;

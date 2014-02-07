@@ -89,5 +89,41 @@ BOOL LASinventory::add(const LASpoint* point)
     if (point->get_I() < min_I) min_I = point->get_I();
     else if (point->get_I() > max_I) max_I = point->get_I();
   }
+  if ((point->get_X()%10) == 0)
+  {
+    xyz_fluff_10[0]++;
+    if ((point->get_X()%100) == 0)
+    {
+      xyz_fluff_100[0]++;
+      if ((point->get_X()%1000) == 0)
+      {
+        xyz_fluff_1000[0]++;
+      }
+    }
+  }
+  if ((point->get_Y()%10) == 0)
+  {
+    xyz_fluff_10[1]++;
+    if ((point->get_Y()%100) == 0)
+    {
+      xyz_fluff_100[1]++;
+      if ((point->get_Y()%1000) == 0)
+      {
+        xyz_fluff_1000[1]++;
+      }
+    }
+  }
+  if ((point->get_Z()%10) == 0)
+  {
+    xyz_fluff_10[2]++;
+    if ((point->get_Z()%100) == 0)
+    {
+      xyz_fluff_100[2]++;
+      if ((point->get_Z()%1000) == 0)
+      {
+        xyz_fluff_1000[2]++;
+      }
+    }
+  }
   return TRUE;
 }
