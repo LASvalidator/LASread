@@ -106,7 +106,7 @@ public:
   inline void get_extra_bytes_attribute(I32 offset, F32 &data) const { data = *((F32*)(extra_bytes + offset)); };
   inline void get_extra_bytes_attribute(I32 offset, F64 &data) const { data = *((F64*)(extra_bytes + offset)); };
 
-  // these funtions describe the point specifics
+  // these functions describe the point specifics
 
   inline BOOL has_gps_time() const { return have_gps_time; };
   inline BOOL has_rgb() const { return have_rgb; };
@@ -114,8 +114,8 @@ public:
   inline BOOL has_nir() const { return have_nir; };
   inline BOOL is_las14() const { return are_las14; };
   inline BOOL has_extra_bytes() const { return (BOOL)(number_of_extra_bytes != 0); };
-  inline I32 get_number_of_extra_bytes() { return number_of_extra_bytes; };
-  inline U32 get_total_point_size() { return total_point_size; };
+  inline I32 get_number_of_extra_bytes() const { return number_of_extra_bytes; };
+  inline U32 get_total_point_size() const { return total_point_size; };
 
   // these functions set the desired point format
 

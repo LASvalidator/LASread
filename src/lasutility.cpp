@@ -40,6 +40,16 @@ LASinventory::LASinventory()
   first = TRUE;
 }
 
+void LASinventory::set_wave_packet_index(const U8 index)
+{
+  wave_packet_index_mask[index/32] |= (1u << (index%32));
+}
+
+BOOL LASinventory::has_wave_packet_index(const U8 index) const
+{
+  return ((wave_packet_index_mask[index/32] & (1u << (index%32))) != 0);
+}
+
 BOOL LASinventory::add(const LASpoint* point)
 {
   number_of_point_records++;
@@ -124,6 +134,10 @@ BOOL LASinventory::add(const LASpoint* point)
         xyz_fluff_1000[2]++;
       }
     }
+  }
+  if (point->has_wave_packet())
+  {
+    set_wave_packet_index(point->get_wave_packet_index());
   }
   return TRUE;
 }

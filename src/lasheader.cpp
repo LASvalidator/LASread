@@ -723,12 +723,12 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
             }
             if (wave_packet_descriptor[idx]->getNumberOfSamples() == 0)
             {
-              sprintf(note, "number of samples for descriptor %d is zero\n", idx);
+              sprintf(note, "number of samples for descriptor %d is zero", idx);
               add_warning("wave packet descriptor", note);
             }
             if (wave_packet_descriptor[idx]->getTemporalSpacing() == 0)
             {
-              sprintf(note, "temporal spacing for descriptor %d is zero\n", idx);
+              sprintf(note, "temporal spacing for descriptor %d is zero", idx);
               add_warning("wave packet descriptor", note);
             }
           }
