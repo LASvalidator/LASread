@@ -340,7 +340,7 @@ BOOL LASreadPoint::read(U8* const * point)
           if (current_chunk == number_chunks)
           {
             number_chunks += 256;
-            chunk_starts = (I64*)realloc(chunk_starts, sizeof(I64)*number_chunks);
+            chunk_starts = (I64*)realloc(chunk_starts, sizeof(I64)*(number_chunks+1));
           }
           chunk_starts[tabled_chunks] = point_start; // needs fixing
           tabled_chunks++;
@@ -411,7 +411,7 @@ BOOL LASreadPoint::read_chunk_table()
   {
     // then compressor was interrupted before getting a chance to write the chunk table
     number_chunks = 256;
-    chunk_starts = (I64*)malloc(sizeof(I64)*number_chunks);
+    chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
     if (chunk_starts == 0)
     {
       return FALSE;
