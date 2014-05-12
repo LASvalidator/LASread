@@ -337,7 +337,7 @@ BOOL LASreadPoint::read(U8* const * point)
         init(instream);
         if (tabled_chunks == current_chunk) // no or incomplete chunk table?
         {
-          if (current_chunk == number_chunks)
+          if (current_chunk == number_chunks || number_chunks < current_chunk)
           {
             number_chunks += 256;
             chunk_starts = (I64*)realloc(chunk_starts, sizeof(I64)*(number_chunks+1));
