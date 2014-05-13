@@ -135,8 +135,8 @@ typedef union U64I64F64 { U64 u64; I64 i64; F64 f64; } U64I64F64;
 #define F32_IS_FINITE(n) ((F32_MIN < (n)) && ((n) < F32_MAX))
 #define F64_IS_FINITE(n) ((F64_MIN < (n)) && ((n) < F64_MAX))
 
-#define F64_ARE_CLOSE_POSITIVE(a,b,fraction) ( ( (a < b) ? ((b - a) < (b * fraction)) : ((a - b) < (a * fraction)) ) )
-#define F64_NOT_CLOSE_POSITIVE(a,b,fraction) ( ( (a < b) ? ((b - a) > (b * fraction)) : ((a - b) > (a * fraction)) ) )
+#define F64_ARE_CLOSE_POSITIVE(a,b,fraction) ( ( ((a) < (b)) ? (((b) - (a)) < ((b) * fraction)) : (((a) - (b)) < ((a) * fraction)) ) )
+#define F64_NOT_CLOSE_POSITIVE(a,b,fraction) ( ( ((a) < (b)) ? (((b) - (a)) > ((b) * fraction)) : (((a) - (b)) > ((a) * fraction)) ) )
 
 #define U32_ZERO_BIT_0(n) (((n)&(U32)0xFFFFFFFE))
 
