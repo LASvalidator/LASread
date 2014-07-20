@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2005-2013, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -407,9 +407,15 @@ BOOL LASreadPoint::read_chunk_table()
   // this is where the chunks start
   I64 chunks_start = instream->tell();
 
+  // was compressor interrupted before getting a chance to write the chunk table?
   if ((chunk_table_start_position + 8) == chunks_start)
   {
-    // then compressor was interrupted before getting a chance to write the chunk table
+    // no choice but to fail if adaptive chunking was used
+    if (chunk_size == U32_MAX)
+    {
+      return FALSE;
+    }
+    // otherwise we build the chunk table as we read the file
     number_chunks = 256;
     chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
     if (chunk_starts == 0)
@@ -421,9 +427,15 @@ BOOL LASreadPoint::read_chunk_table()
     return TRUE;
   }
 
+  // maybe the stream is not seekable
   if (!instream->isSeekable())
   {
-    // if the stream is not seekable we cannot seek to the chunk table but won't need it anyways
+    // no choice but to fail if adaptive chunking was used
+    if (chunk_size == U32_MAX)
+    {
+      return FALSE;
+    }
+    // then we cannot seek to the chunk table but won't need it anyways
     number_chunks = U32_MAX-1;
     tabled_chunks = 0;
     return TRUE;
@@ -498,11 +510,32 @@ BOOL LASreadPoint::read_chunk_table()
     // something went wrong while reading the chunk table
     if (chunk_totals) delete [] chunk_totals;
     chunk_totals = 0;
-    // fix as many additional chunk_starts as possible
-    U32 i;
-    for (i = 1; i < tabled_chunks; i++)
+    // no choice but to fail if adaptive chunking was used
+    if (chunk_size == U32_MAX)
     {
-      chunk_starts[i] += chunk_starts[i-1];
+      return FALSE;
+    }
+    // did we not even read the number of chunks
+    if (number_chunks == U32_MAX)
+    {
+      // then compressor was interrupted before getting a chance to write the chunk table
+      number_chunks = 256;
+      chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
+      if (chunk_starts == 0)
+      {
+        return FALSE;
+      }
+      chunk_starts[0] = chunks_start;
+      tabled_chunks = 1;
+    }
+    else
+    {
+      // otherwise fix as many additional chunk_starts as possible
+      U32 i;
+      for (i = 1; i < tabled_chunks; i++)
+      {
+        chunk_starts[i] += chunk_starts[i-1];
+      }
     }
   }
   if (!instream->seek(chunks_start))
