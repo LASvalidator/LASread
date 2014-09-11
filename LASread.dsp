@@ -169,10 +169,6 @@ SOURCE=.\src\bytestreamin_istream.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\entropydecoder.hpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\integerdecompressor.hpp
 # End Source File
 # Begin Source File
@@ -226,6 +222,10 @@ SOURCE=.\inc\laswaveformreader.hpp
 # Begin Source File
 
 SOURCE=.\inc\laszip.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laszip_common_v1.hpp
 # End Source File
 # Begin Source File
 

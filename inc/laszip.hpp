@@ -114,8 +114,8 @@ public:
   unsigned short version_revision;
   unsigned int options;
   unsigned int chunk_size; 
-  SIGNED_INT64 num_points;  /* not mandatory ... -1 if unknown */
-  SIGNED_INT64 num_bytes;   /* not mandatory ... -1 if unknown */
+  SIGNED_INT64 number_of_special_evlrs; /* must be -1 if unused */
+  SIGNED_INT64 offset_to_special_evlrs; /* must be -1 if unused */
   unsigned short num_items;
   LASitem* items;
 
