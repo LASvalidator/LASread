@@ -464,16 +464,16 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
           laszip = new LASzip();
 
           // read this data following the header of the variable length record
-          //     U16  compressor         2 bytes 
-          //     U32  coder              2 bytes 
-          //     U8   version_major      1 byte 
-          //     U8   version_minor      1 byte
-          //     U16  version_revision   2 bytes
-          //     U32  options            4 bytes 
-          //     I32  chunk_size         4 bytes
-          //     I64  num_points         8 bytes
-          //     I64  num_bytes          8 bytes
-          //     U16  num_items          2 bytes
+          //     U16  compressor                2 bytes 
+          //     U32  coder                     2 bytes 
+          //     U8   version_major             1 byte 
+          //     U8   version_minor             1 byte
+          //     U16  version_revision          2 bytes
+          //     U32  options                   4 bytes 
+          //     I32  chunk_size                4 bytes
+          //     I64  number_of_special_evlrs   8 bytes
+          //     I64  offset_to_special_evlrs   8 bytes
+          //     U16  num_items                 2 bytes
           //        U16 type                2 bytes * num_items
           //        U16 size                2 bytes * num_items
           //        U16 version             2 bytes * num_items
@@ -514,14 +514,14 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
             add_fail("file IO", "error reading VLR laszip->chunk_size");
             return FALSE;
           }
-          try { stream->get64bitsLE((U8*)&(laszip->num_points)); } catch(...)
+          try { stream->get64bitsLE((U8*)&(laszip->number_of_special_evlrs)); } catch(...)
           {
-            add_fail("file IO", "error reading VLR laszip->num_points");
+            add_fail("file IO", "error reading VLR laszip->number_of_special_evlrs");
             return FALSE;
           }
-          try { stream->get64bitsLE((U8*)&(laszip->num_bytes)); } catch(...)
+          try { stream->get64bitsLE((U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
           {
-            add_fail("file IO", "error reading VLR laszip->num_bytes");
+            add_fail("file IO", "error reading VLR laszip->offset_to_special_evlrs");
             return FALSE;
           }
           try { stream->get16bitsLE((U8*)&(laszip->num_items)); } catch(...)

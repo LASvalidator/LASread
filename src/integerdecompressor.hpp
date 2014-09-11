@@ -46,14 +46,14 @@
 #ifndef INTEGER_COMPRESSOR_HPP
 #define INTEGER_COMPRESSOR_HPP
 
-#include "entropydecoder.hpp"
+#include "arithmeticdecoder.hpp"
 
 class IntegerCompressor
 {
 public:
 
   // Constructor & Deconstructor
-  IntegerCompressor(EntropyDecoder* dec, U32 bits=16, U32 contexts=1, U32 bits_high=8, U32 range=0);
+  IntegerCompressor(ArithmeticDecoder* dec, U32 bits=16, U32 contexts=1, U32 bits_high=8, U32 range=0);
   ~IntegerCompressor();
 
   // Manage Decompressor
@@ -64,7 +64,7 @@ public:
   U32 getK() const {return k;};
 
 private:
-  I32 readCorrector(EntropyModel* model);
+  I32 readCorrector(ArithmeticModel* model);
 
   U32 k;
 
@@ -79,11 +79,11 @@ private:
   I32 corr_min;
   I32 corr_max;
 
-  EntropyDecoder* dec;
+  ArithmeticDecoder* dec;
 
-  EntropyModel** mBits;
+  ArithmeticModel** mBits;
 
-  EntropyModel** mCorrector;
+  ArithmeticModel** mCorrector;
 
   int** corr_histogram;
 };

@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -21,7 +21,7 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
   
     see corresponding header file
@@ -76,7 +76,7 @@ struct LASpoint14
   U8 dummy_for_eight_byte_alignment;
 };
 
-LASreadItemCompressed_POINT10_v1::LASreadItemCompressed_POINT10_v1(EntropyDecoder* dec)
+LASreadItemCompressed_POINT10_v1::LASreadItemCompressed_POINT10_v1(ArithmeticDecoder* dec)
 {
   U32 i;
 
@@ -297,7 +297,7 @@ inline void LASreadItemCompressed_POINT10_v1::read(U8* item)
 
 #define LASZIP_GPSTIME_MULTIMAX 512
 
-LASreadItemCompressed_GPSTIME11_v1::LASreadItemCompressed_GPSTIME11_v1(EntropyDecoder* dec)
+LASreadItemCompressed_GPSTIME11_v1::LASreadItemCompressed_GPSTIME11_v1(ArithmeticDecoder* dec)
 {
   /* set decoder */
   assert(dec);
@@ -407,7 +407,7 @@ inline void LASreadItemCompressed_GPSTIME11_v1::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_RGB12_v1::LASreadItemCompressed_RGB12_v1(EntropyDecoder* dec)
+LASreadItemCompressed_RGB12_v1::LASreadItemCompressed_RGB12_v1(ArithmeticDecoder* dec)
 {
   /* set decoder */
   assert(dec);
@@ -475,7 +475,7 @@ struct LASwavepacket13
   U32I32F32 z;
 };
 
-LASreadItemCompressed_WAVEPACKET13_v1::LASreadItemCompressed_WAVEPACKET13_v1(EntropyDecoder* dec)
+LASreadItemCompressed_WAVEPACKET13_v1::LASreadItemCompressed_WAVEPACKET13_v1(ArithmeticDecoder* dec)
 {
   /* set decoder */
   assert(dec);
@@ -499,10 +499,10 @@ LASreadItemCompressed_WAVEPACKET13_v1::LASreadItemCompressed_WAVEPACKET13_v1(Ent
 LASreadItemCompressed_WAVEPACKET13_v1::~LASreadItemCompressed_WAVEPACKET13_v1()
 {
   dec->destroySymbolModel(m_packet_index);
-  dec->destroyBitModel(m_offset_diff[0]);
-  dec->destroyBitModel(m_offset_diff[1]);
-  dec->destroyBitModel(m_offset_diff[2]);
-  dec->destroyBitModel(m_offset_diff[3]);
+  dec->destroySymbolModel(m_offset_diff[0]);
+  dec->destroySymbolModel(m_offset_diff[1]);
+  dec->destroySymbolModel(m_offset_diff[2]);
+  dec->destroySymbolModel(m_offset_diff[3]);
   delete ic_offset_diff;
   delete ic_packet_size;
   delete ic_return_point;
@@ -571,7 +571,7 @@ inline void LASreadItemCompressed_WAVEPACKET13_v1::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_BYTE_v1::LASreadItemCompressed_BYTE_v1(EntropyDecoder* dec, U32 number)
+LASreadItemCompressed_BYTE_v1::LASreadItemCompressed_BYTE_v1(ArithmeticDecoder* dec, U32 number)
 {
   /* set decoder */
   assert(dec);

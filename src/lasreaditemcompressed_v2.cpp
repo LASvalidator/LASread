@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -70,7 +70,7 @@ struct LASpoint14
   U8 dummy_for_eight_byte_alignment;
 };
 
-LASreadItemCompressed_POINT10_v2::LASreadItemCompressed_POINT10_v2(EntropyDecoder* dec)
+LASreadItemCompressed_POINT10_v2::LASreadItemCompressed_POINT10_v2(ArithmeticDecoder* dec)
 {
   U32 i;
 
@@ -291,7 +291,7 @@ inline void LASreadItemCompressed_POINT10_v2::read(U8* item)
 
 #define LASZIP_GPSTIME_MULTI_TOTAL (LASZIP_GPSTIME_MULTI - LASZIP_GPSTIME_MULTI_MINUS + 6) 
 
-LASreadItemCompressed_GPSTIME11_v2::LASreadItemCompressed_GPSTIME11_v2(EntropyDecoder* dec)
+LASreadItemCompressed_GPSTIME11_v2::LASreadItemCompressed_GPSTIME11_v2(ArithmeticDecoder* dec)
 {
   /* set decoder */
   assert(dec);
@@ -446,7 +446,7 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_RGB12_v2::LASreadItemCompressed_RGB12_v2(EntropyDecoder* dec)
+LASreadItemCompressed_RGB12_v2::LASreadItemCompressed_RGB12_v2(ArithmeticDecoder* dec)
 {
   /* set decoder */
   assert(dec);
@@ -571,7 +571,7 @@ inline void LASreadItemCompressed_RGB12_v2::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_BYTE_v2::LASreadItemCompressed_BYTE_v2(EntropyDecoder* dec, U32 number)
+LASreadItemCompressed_BYTE_v2::LASreadItemCompressed_BYTE_v2(ArithmeticDecoder* dec, U32 number)
 {
   U32 i;
 
@@ -582,7 +582,7 @@ LASreadItemCompressed_BYTE_v2::LASreadItemCompressed_BYTE_v2(EntropyDecoder* dec
   this->number = number;
 
   /* create models and integer compressors */
-  m_byte = new EntropyModel*[number];
+  m_byte = new ArithmeticModel*[number];
   for (i = 0; i < number; i++)
   {
     m_byte[i] = dec->createSymbolModel(256);

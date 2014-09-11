@@ -43,7 +43,7 @@
 #include <math.h>
 #endif
 
-IntegerCompressor::IntegerCompressor(EntropyDecoder* dec, U32 bits, U32 contexts, U32 bits_high, U32 range)
+IntegerCompressor::IntegerCompressor(ArithmeticDecoder* dec, U32 bits, U32 contexts, U32 bits_high, U32 range)
 {
   assert(dec);
   this->dec = dec;
@@ -106,7 +106,7 @@ IntegerCompressor::~IntegerCompressor()
 #ifndef COMPRESS_ONLY_K
   if (mCorrector)
   {
-    dec->destroyBitModel(mCorrector[0]);
+    dec->destroyBitModel((ArithmeticBitModel*)mCorrector[0]);
     for (i = 1; i <= corr_bits; i++)
     {
       dec->destroySymbolModel(mCorrector[i]);
@@ -158,23 +158,23 @@ void IntegerCompressor::initDecompressor()
   // maybe create the models
   if (mBits == 0)
   {
-    mBits = new EntropyModel*[contexts];
+    mBits = new ArithmeticModel*[contexts];
     for (i = 0; i < contexts; i++)
     {
-      mBits[i] = (EntropyModel*)dec->createSymbolModel(corr_bits+1);
+      mBits[i] = dec->createSymbolModel(corr_bits+1);
     }
 #ifndef COMPRESS_ONLY_K
-    mCorrector = new EntropyModel*[corr_bits+1];
-    mCorrector[0] = (EntropyModel*)dec->createBitModel();
+    mCorrector = new ArithmeticModel*[corr_bits+1];
+    mCorrector[0] = (ArithmeticModel*)dec->createBitModel();
     for (i = 1; i <= corr_bits; i++)
     {
       if (i <= bits_high)
       {
-        mCorrector[i] = (EntropyModel*)dec->createSymbolModel(1<<i);
+        mCorrector[i] = dec->createSymbolModel(1<<i);
       }
       else
       {
-        mCorrector[i] = (EntropyModel*)dec->createSymbolModel(1<<bits_high);
+        mCorrector[i] = dec->createSymbolModel(1<<bits_high);
       }
     }
 #endif
@@ -186,7 +186,7 @@ void IntegerCompressor::initDecompressor()
     dec->initSymbolModel(mBits[i]);
   }
 #ifndef COMPRESS_ONLY_K
-  dec->initBitModel(mCorrector[0]);
+  dec->initBitModel((ArithmeticBitModel*)mCorrector[0]);
   for (i = 1; i <= corr_bits; i++)
   {
     dec->initSymbolModel(mCorrector[i]);
@@ -238,7 +238,7 @@ else
 }
 */
 
-I32 IntegerCompressor::readCorrector(EntropyModel* mBits)
+I32 IntegerCompressor::readCorrector(ArithmeticModel* mBits)
 {
   I32 c;
 
@@ -315,7 +315,7 @@ I32 IntegerCompressor::readCorrector(EntropyModel* mBits)
   }
   else // then c is either 0 or 1
   {
-    c = dec->decodeBit(mCorrector[0]);
+    c = dec->decodeBit((ArithmeticBitModel*)mCorrector[0]);
   }
 #endif // COMPRESS_ONLY_K
 

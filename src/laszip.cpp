@@ -46,8 +46,8 @@ LASzip::LASzip()
   options = 0;
   num_items = 0;
   chunk_size = LASZIP_CHUNK_SIZE_DEFAULT;
-  num_points = -1;
-  num_bytes = -1;
+  number_of_special_evlrs = -1;
+  offset_to_special_evlrs = -1;
   error_string = 0;
   items = 0;
   bytes = 0;
@@ -106,9 +106,9 @@ bool LASzip::unpack(const U8* bytes, const I32 num)
   b += 4;
   chunk_size = *((U32*)b);
   b += 4;
-  num_points = *((I64*)b);
+  number_of_special_evlrs = *((I64*)b);
   b += 8;
-  num_bytes = *((I64*)b);
+  offset_to_special_evlrs = *((I64*)b);
   b += 8;
   num_items = *((U16*)b);
   b += 2;
@@ -160,9 +160,9 @@ bool LASzip::pack(U8*& bytes, I32& num)
   b += 4;
   *((U32*)b) = chunk_size;
   b += 4;
-  *((I64*)b) = num_points;
+  *((I64*)b) = number_of_special_evlrs;
   b += 8;
-  *((I64*)b) = num_bytes;
+  *((I64*)b) = offset_to_special_evlrs;
   b += 8;
   *((U16*)b) = num_items;
   b += 2;
@@ -186,10 +186,17 @@ const char* LASzip::get_error() const
 
 bool LASzip::return_error(const char* error)
 {
+
+#if defined(_MSC_VER) && \
+    (_MSC_FULL_VER >= 150000000)
+#define CopyString _strdup
+#else
+#define CopyString strdup
+#endif
   char err[256];
   sprintf(err, "%s (LASzip v%d.%dr%d)", error, LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION);
   if (error_string) free(error_string);
-  error_string = strdup(err);
+  error_string = CopyString(err);
   return false;
 }
 
@@ -394,9 +401,11 @@ bool LASzip::setup(U16* num_items, LASitem** items, const U8 point_type, const U
 
   if (extra_bytes_number < 0)
   {
-    char error[64];
-    sprintf(error, "point size %d too small for point type %d by %d bytes", point_size, point_type, -extra_bytes_number);
-    return return_error(error);
+//    char error[64];
+//    sprintf(error, "point size %d too small for point type %d by %d bytes", point_size, point_type, -extra_bytes_number);
+//    return return_error(error);
+    fprintf(stderr, "WARNING: point size %d too small by %d bytes for point type %d. assuming point_size of %d\n", point_size, -extra_bytes_number, point_type, point_size-extra_bytes_number);
+    extra_bytes_number = 0;
   }
 
   // create item description
@@ -777,6 +786,9 @@ bool LASitem::is_type(LASitem::Type t) const
   case POINT10:
       if (size != 20) return false;
       break;
+  case POINT14:
+      if (size != 30) return false;
+      break;
   case GPSTIME11:
       if (size != 8) return false;
       break;
@@ -802,6 +814,9 @@ const char* LASitem::get_name() const
   case POINT10:
       return "POINT10";
       break;
+  case POINT14:
+      return "POINT14";
+      break;
   case GPSTIME11:
       return "GPSTIME11";
       break;
@@ -819,4 +834,3 @@ const char* LASitem::get_name() const
   }
   return 0;
 }
-
