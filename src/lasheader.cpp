@@ -111,9 +111,9 @@ BOOL LASheader::load_header(ByteStreamIn* stream)
     add_fail("file IO", "error reading header.file_signature");
     return FALSE;
   }
-  try { stream->get16bitsLE((U8*)&file_source_id); } catch(...)
+  try { stream->get16bitsLE((U8*)&file_source_ID); } catch(...)
   {
-    add_fail("file IO", "error reading header.file_source_id");
+    add_fail("file IO", "error reading header.file_source_ID");
     return FALSE;
   }
   try { stream->get16bitsLE((U8*)&global_encoding); } catch(...)

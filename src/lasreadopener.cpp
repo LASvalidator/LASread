@@ -244,7 +244,9 @@ void LASreadOpener::set_file_name(const char* file_name, BOOL unique)
 }
 
 #ifdef _WIN32
+
 #include <windows.h>
+
 BOOL LASreadOpener::add_file_name(const char* file_name, BOOL unique)
 {
   BOOL r = FALSE;
@@ -278,6 +280,7 @@ BOOL LASreadOpener::add_file_name(const char* file_name, BOOL unique)
   }
   return r;
 }
+
 BOOL LASreadOpener::add_directory(const char* directory_name, BOOL recursive)
 {
   BOOL r = FALSE;
@@ -313,12 +316,15 @@ BOOL LASreadOpener::add_directory(const char* directory_name, BOOL recursive)
 */
   return r;
 }
+
 #else
+
 BOOL LASreadOpener::add_directory(const char* directory_name, BOOL recursive)
 {
   BOOL r = FALSE;
   return r;
 }
+
 #endif
 
 #ifdef _WIN32

@@ -2,7 +2,7 @@
 ===============================================================================
 
   FILE:  lasheader.hpp
-  
+
   CONTENTS:
   
     Contains the header definitions for LAS formats 1.0 to 1.4
@@ -45,7 +45,7 @@ class LASheader : public LASquantizer, public LASattributer, public LASerror
 {
 public:
   CHAR file_signature[4];
-  U16 file_source_id;
+  U16 file_source_ID;
   U16 global_encoding;
   U32 project_ID_GUID_data_1;
   U16 project_ID_GUID_data_2;
