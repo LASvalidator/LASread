@@ -663,11 +663,69 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
             ogc_wkt = (CHAR*)vlrs[i].data;
             ogc_wkt_num = vlrs[i].record_length_after_header;
           }
+          else
+          {
+            add_fail("VLR", "variable length records contains unknown LASF_Projection VLR");
+            success = FALSE;
+          }
         }
         else
         {
-          add_fail("VLR", "no payload for LASF_Projection VLR");
-          success = FALSE;
+          if (vlrs[i].record_id == 34735) // GeoKeyDirectoryTag
+          {
+            if (geokeys)
+            {
+              add_fail("VLR", "variable length records contain more than one GeoKeyDirectory, one with empty payload");
+              success = FALSE;
+            }
+            else
+            {
+              add_fail("VLR", "no payload to specify GeoKeyDirectory in LASF_Projection VLR");
+              success = FALSE;
+            }
+          }
+          else if (vlrs[i].record_id == 34736) // GeoDoubleParamsTag
+          {
+            if (geokey_double_params)
+            {
+              add_fail("VLR", "variable length records contain more than one GeoDoubleParamsTag, one with empty payload");
+              success = FALSE;
+            }
+            else
+            {
+              add_warning("VLR", "no payload for GeoDoubleParamsTag in LASF_Projection VLR");
+            }
+          }
+          else if (vlrs[i].record_id == 34737) // GeoAsciiParamsTag
+          {
+            if (geokey_ascii_params)
+            {
+              add_fail("VLR", "variable length records contain more than one GeoAsciiParamsTag, one with empty payload");
+              success = FALSE;
+            }
+            else
+            {
+              add_warning("VLR", "no payload for GeoAsciiParamsTag in LASF_Projection VLR");
+            }
+          }
+          else if (vlrs[i].record_id == 2112) // GeoOCGWKTParamsTag
+          {
+            if (ogc_wkt)
+            {
+              add_fail("VLR", "variable length records contain more than one GeoOCGWKTParamsTag, one with empty payload");
+              success = FALSE;
+            }
+            else
+            {
+              add_fail("VLR", "no payload to specify GeoOCGWKTParamsTag in LASF_Projection VLR");
+              success = FALSE;
+            }
+          }
+          else
+          {
+            add_fail("VLR", "variable length records contains unknown LASF_Projection VLR with empty payload");
+            success = FALSE;
+          }
         }
       }
       else if (strcmp(vlrs[i].user_id, "LASF_Spec") == 0)
