@@ -30,6 +30,7 @@
   
   CHANGE HISTORY:
   
+     2 August 2015 -- not failing but warning if OCG WRT has an empty payload 
     12 April 2015 -- not failing but warning for certain empty VLR payloads 
     27 April 2013 -- adapted from the LASlib library for the ASPRS LASvalidator
   

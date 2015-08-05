@@ -715,10 +715,9 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
               add_fail("VLR", "variable length records contain more than one GeoOCGWKTParamsTag, one with empty payload");
               success = FALSE;
             }
-            else
+            else // Coordinate Reference System was *intentionally* not specified 
             {
-              add_fail("VLR", "no payload to specify GeoOCGWKTParamsTag in LASF_Projection VLR");
-              success = FALSE;
+              ogc_wkt = file_signature;
             }
           }
           else
@@ -988,76 +987,136 @@ BOOL LASheader::load_evlrs(ByteStreamIn* stream)
 
           if (strcmp(evlrs[i].user_id, "LASF_Projection") == 0)
           {
-            if (evlrs[i].record_id == 34735) // GeoKeyDirectoryTag
+            if (evlrs[i].data)
             {
-              if (geokeys)
+              if (evlrs[i].record_id == 34735) // GeoKeyDirectoryTag
               {
-                add_fail("EVLR", "extended variable length records contain more than one GeoKeyDirectory");
-                success = FALSE;
-              }
-              geokeys = (LASgeokeys*)evlrs[i].data;
+                if (geokeys)
+                {
+                  add_fail("EVLR", "extended variable length records contain more than one GeoKeyDirectory");
+                  success = FALSE;
+                }
+                geokeys = (LASgeokeys*)evlrs[i].data;
 
-              // check variable header geo keys contents
+                // check variable header geo keys contents
 
-              if (geokeys->key_directory_version != 1)
-              {
-                sprintf(note, "wrong geokeys->key_directory_version: %d != 1", (I32)geokeys->key_directory_version);
-                add_fail("EVLR", note);
-                success = FALSE;
+                if (geokeys->key_directory_version != 1)
+                {
+                  sprintf(note, "wrong geokeys->key_directory_version: %d != 1", (I32)geokeys->key_directory_version);
+                  add_fail("EVLR", note);
+                  success = FALSE;
+                }
+                if (geokeys->key_revision != 1)
+                {
+                  sprintf(note, "wrong geokeys->key_revision: %d != 1", (I32)geokeys->key_revision);
+                  add_fail("EVLR", note);
+                  success = FALSE;
+                }
+                if (geokeys->minor_revision != 0)
+                {
+                  sprintf(note, "wrong geokeys->minor_revision: %d != 1", (I32)geokeys->minor_revision);
+                  add_fail("EVLR", note);
+                  success = FALSE;
+                }
+                geokey_entries = (LASgeokey_entry*)&geokeys[1];
+                if (evlrs[i].record_length_after_header != ((geokeys->number_of_keys+1)*8))
+                {
+                  sprintf(note, "payload size of %d for geokey EVLR cannot hold %u + 1 geokey entries", (I32)evlrs[i].record_length_after_header, geokeys->number_of_keys);
+                  add_fail("EVLR", note);
+                  success = FALSE;
+                }
               }
-              if (geokeys->key_revision != 1)
+              else if (evlrs[i].record_id == 34736) // GeoDoubleParamsTag
               {
-                sprintf(note, "wrong geokeys->key_revision: %d != 1", (I32)geokeys->key_revision);
-                add_fail("EVLR", note);
-                success = FALSE;
+                if (geokey_double_params)
+                {
+                  add_fail("EVLR", "extended variable length records contain more than one GeoDoubleParamsTag");
+                  success = FALSE;
+                }
+                geokey_double_params = (F64*)evlrs[i].data;
+                if (((U32)evlrs[i].record_length_after_header % 8) != 0)
+                {
+                  sprintf(note, "payload size of %d for GeokeyDoubleParams EVLR is not a multiple of 8", (I32)evlrs[i].record_length_after_header);
+                  add_fail("EVLR", note);
+                  success = FALSE;
+                }
+                geokey_double_params_num = (U32)evlrs[i].record_length_after_header / 8;
               }
-              if (geokeys->minor_revision != 0)
+              else if (evlrs[i].record_id == 34737) // GeoAsciiParamsTag
               {
-                sprintf(note, "wrong geokeys->minor_revision: %d != 1", (I32)geokeys->minor_revision);
-                add_fail("EVLR", note);
-                success = FALSE;
+                if (geokey_ascii_params)
+                {
+                  add_fail("EVLR", "extended variable length records contain more than one GeoAsciiParamsTag");
+                  success = FALSE;
+                }
+                geokey_ascii_params = (CHAR*)evlrs[i].data;
               }
-              geokey_entries = (LASgeokey_entry*)&geokeys[1];
-              if (evlrs[i].record_length_after_header != ((geokeys->number_of_keys+1)*8))
+              else if (evlrs[i].record_id == 2112) // GeoOCGWKTParamsTag
               {
-                sprintf(note, "payload size of %d for geokey EVLR cannot hold %u + 1 geokey entries", (I32)evlrs[i].record_length_after_header, geokeys->number_of_keys);
-                add_fail("EVLR", note);
-                success = FALSE;
+                if (ogc_wkt)
+                {
+                  add_fail("EVLR", "extended variable length records contain more than one GeoOCGWKTParamsTag");
+                  success = FALSE;
+                }
+                ogc_wkt = (CHAR*)evlrs[i].data;
               }
             }
-            else if (evlrs[i].record_id == 34736) // GeoDoubleParamsTag
+            else
             {
-              if (geokey_double_params)
+              if (evlrs[i].record_id == 34735) // GeoKeyDirectoryTag
               {
-                add_fail("EVLR", "extended variable length records contain more than one GeoDoubleParamsTag");
+                if (geokeys)
+                {
+                  add_fail("EVLR", "variable length record contains another GeoKeyDirectory, one with empty payload");
+                  success = FALSE;
+                }
+                else
+                {
+                  add_fail("EVLR", "no payload to specify GeoKeyDirectory in LASF_Projection VLR");
+                  success = FALSE;
+                }
+              }
+              else if (evlrs[i].record_id == 34736) // GeoDoubleParamsTag
+              {
+                if (geokey_double_params)
+                {
+                  add_fail("EVLR", "variable length record contains another GeoDoubleParamsTag, one with empty payload");
+                  success = FALSE;
+                }
+                else
+                {
+                  add_warning("EVLR", "no payload for GeoDoubleParamsTag in LASF_Projection EVLR");
+                }
+              }
+              else if (evlrs[i].record_id == 34737) // GeoAsciiParamsTag
+              {
+                if (geokey_ascii_params)
+                {
+                  add_fail("EVLR", "variable length record contains another GeoAsciiParamsTag, one with empty payload");
+                  success = FALSE;
+                }
+                else
+                {
+                  add_warning("EVLR", "no payload for GeoAsciiParamsTag in LASF_Projection EVLR");
+                }
+              }
+              else if (evlrs[i].record_id == 2112) // GeoOCGWKTParamsTag
+              {
+                if (ogc_wkt)
+                {
+                  add_fail("EVLR", "extended variable length record contains another GeoOCGWKTParamsTag, one with empty payload");
+                  success = FALSE;
+                }
+                else // Coordinate Reference System was *intentionally* not specified 
+                {
+                  ogc_wkt = file_signature;
+                }
+              }
+              else
+              {
+                add_fail("EVLR", "extended variable length records contains unknown LASF_Projection EVLR with empty payload");
                 success = FALSE;
               }
-              geokey_double_params = (F64*)evlrs[i].data;
-              if (((U32)evlrs[i].record_length_after_header % 8) != 0)
-              {
-                sprintf(note, "payload size of %d for GeokeyDoubleParams EVLR is not a multiple of 8", (I32)evlrs[i].record_length_after_header);
-                add_fail("EVLR", note);
-                success = FALSE;
-              }
-              geokey_double_params_num = (U32)evlrs[i].record_length_after_header / 8;
-            }
-            else if (evlrs[i].record_id == 34737) // GeoAsciiParamsTag
-            {
-              if (geokey_ascii_params)
-              {
-                add_fail("EVLR", "extended variable length records contain more than one GeoAsciiParamsTag");
-                success = FALSE;
-              }
-              geokey_ascii_params = (CHAR*)evlrs[i].data;
-            }
-            else if (evlrs[i].record_id == 2112) // GeoOCGWKTParamsTag
-            {
-              if (ogc_wkt)
-              {
-                add_fail("EVLR", "extended variable length records contain more than one GeoOCGWKTParamsTag");
-                success = FALSE;
-              }
-              ogc_wkt = (CHAR*)evlrs[i].data;
             }
           }
           else if (strcmp(evlrs[i].user_id, "LASF_Spec") == 0)
@@ -1066,7 +1125,7 @@ BOOL LASheader::load_evlrs(ByteStreamIn* stream)
             {
               if (classification)
               {
-                add_fail("EVLR", "extended variable length records contain more than one ClassificationLookup");
+                add_fail("EVLR", "extended variable length record contains another ClassificationLookup");
                 success = FALSE;
               }
               classification = (LASclassification*)evlrs[i].data;
