@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
   
+     5 September 2015 -- fixed alignment bug for GPS time for new LAS 1.4 points
     27 April 2013 -- adapted from the LASzip library for the ASPRS LASvalidator
   
 ===============================================================================
@@ -135,15 +136,6 @@ public:
   LASpoint();
   ~LASpoint();
 
-  // this field provides generic access to the point data
-
-  U8** point;
-
-  // these fields describe the point format terms of generic items
-
-  U16 num_items;
-  LASitem* items;
-
 protected:
 
   // these fields store the point attributes
@@ -190,6 +182,17 @@ protected:
 // for attributed access to the extra bytes
 
   const LASattributer* attributer;
+
+public:
+
+  // this field provides generic access to the point data
+
+  U8** point;
+
+  // these fields describe the point format terms of generic items
+
+  U16 num_items;
+  LASitem* items;
 };
 
 #endif
