@@ -620,11 +620,32 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
               success = FALSE;
             }
             geokey_entries = (LASgeokey_entry*)&geokeys[1];
-            if (vlrs[i].record_length_after_header != ((geokeys->number_of_keys+1)*8))
+            if (vlrs[i].record_length_after_header < ((geokeys->number_of_keys+1)*8))
             {
-              sprintf(note, "payload size of %d for geokey VLR cannot hold %u + 1 geokey entries", (I32)vlrs[i].record_length_after_header, geokeys->number_of_keys);
+              sprintf(note, "payload size of %d for geokey VLR too small to hold %u + 1 geokey entries", (I32)vlrs[i].record_length_after_header, geokeys->number_of_keys);
               add_fail("VLR", note);
               success = FALSE;
+            }
+            else if (vlrs[i].record_length_after_header > ((geokeys->number_of_keys+1)*8))
+            {
+              U32 padding = vlrs[i].record_length_after_header - ((geokeys->number_of_keys+1)*8);
+              if (padding % 8) // strange padding
+              {
+                sprintf(note, "payload size of %d for geokey VLR with %u + 1 geokey entries has strange padding of %u bytes", (I32)vlrs[i].record_length_after_header, geokeys->number_of_keys, padding);
+                add_fail("VLR", note);
+                success = FALSE;
+              }
+              else if (padding > 400) // excessive padding
+              {
+                sprintf(note, "payload size of %d for geokey VLR with %u + 1 geokey entries has excessive padding of %u bytes", (I32)vlrs[i].record_length_after_header, geokeys->number_of_keys, padding);
+                add_fail("VLR", note);
+                success = FALSE;
+              }
+              else
+              {
+                sprintf(note, "payload size of %d for geokey VLR with %u + 1 geokey entries has padding of %u bytes. while the VLR is valid, software that (incorrectly) uses the VLR size to determine the number of geokey may fail.", (I32)vlrs[i].record_length_after_header, geokeys->number_of_keys, padding);
+                add_warning("VLR", note);
+              }
             }
           }
           else if (vlrs[i].record_id == 34736) // GeoDoubleParamsTag
