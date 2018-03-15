@@ -125,6 +125,14 @@ SOURCE=.\src\lasreaditemcompressed_v2.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasreaditemcompressed_v3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasreaditemcompressed_v4.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasreadopener.cpp
 # End Source File
 # Begin Source File
@@ -158,6 +166,10 @@ SOURCE=.\src\arithmeticmodel.hpp
 # Begin Source File
 
 SOURCE=.\src\bytestreamin.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\bytestreamin_array.hpp
 # End Source File
 # Begin Source File
 
@@ -201,6 +213,14 @@ SOURCE=.\src\lasreaditemcompressed_v2.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasreaditemcompressed_v3.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasreaditemcompressed_v4.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasreaditemraw.hpp
 # End Source File
 # Begin Source File
@@ -230,6 +250,14 @@ SOURCE=.\src\laszip_common_v1.hpp
 # Begin Source File
 
 SOURCE=.\src\laszip_common_v2.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laszip_common_v3.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laszip_decompress_selective_v3.hpp
 # End Source File
 # Begin Source File
 

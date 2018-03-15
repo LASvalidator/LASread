@@ -813,6 +813,7 @@ BOOL LASheader::load_vlrs(ByteStreamIn* stream)
           else
           {
             sprintf(note, "variable length records define LASF_Spec with unknown record ID %d", vlrs[i].record_id);
+            add_fail("VLR", note);
             success = FALSE;
           }
         }

@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laszip.hpp
-  
+
   CONTENTS:
-  
+
     Contains LASitem and LASchunk structs as well as the IDs of the currently
     supported entropy coding scheme
 
@@ -14,19 +14,37 @@
 
   COPYRIGHT:
 
-    (c) 2005-2013, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
-    Foundation. See the COPYING.txt file for more information.
+    Foundation. See the COPYING file for more information.
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
   
-    27 April 2013 -- adapted from the LASzib library for the ASPRS LASvalidator
-  
+    9 February 2018 -- minor version increment as it can read v4 compressed items
+    28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao 
+    23 August 2017 -- minor version increment for C++ stream-based read/write API
+    28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
+    8 April 2017 -- new check for whether point size and total size of items match
+    30 March 2017 -- support for "native LAS 1.4 extension" added into main branch
+    7 January 2017 -- set reserved VLR field from 0xAABB to 0x0 in DLL
+    7 January 2017 -- consistent compatibility mode scan angle quantization in DLL
+    7 January 2017 -- compatibility mode *decompression* fix for waveforms in DLL
+    25 February 2016 -- depreciating old libLAS laszipper/lasunzipper binding
+    29 July 2013 -- reorganized to create an easy-to-use LASzip DLL 
+    5 December 2011 -- learns the chunk table if it is missing (e.g. truncated LAZ)
+    6 October 2011 -- large file support, ability to read with missing chunk table
+    23 June 2011 -- turned on LASzip version 2.0 compressor with chunking 
+    8 May 2011 -- added an option for variable chunking via chunk()
+    23 April 2011 -- changed interface for simplicity and chunking support
+    20 March 2011 -- incrementing LASZIP_VERSION to 1.2 for improved compression
+    10 January 2011 -- licensing change for LGPL release and liblas integration
+    12 December 2010 -- refactored from lasdefinitions after movies with silke
+
 ===============================================================================
 */
 #ifndef LASZIP_HPP
@@ -39,16 +57,23 @@ typedef __int64   SIGNED_INT64;
 typedef long long SIGNED_INT64;
 #endif
 
-//#ifdef LASZIP_ENABLED
+#if defined(_MSC_VER) && \
+    (_MSC_FULL_VER >= 150000000)
+#define LASCopyString _strdup
+#else
+#define LASCopyString strdup
+#endif
 
-#define LASZIP_VERSION_MAJOR    2
-#define LASZIP_VERSION_MINOR    1
-#define LASZIP_VERSION_REVISION 0
+#define LASZIP_VERSION_MAJOR                3
+#define LASZIP_VERSION_MINOR                2
+#define LASZIP_VERSION_REVISION             0
+#define LASZIP_VERSION_BUILD_DATE      180209
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
 #define LASZIP_COMPRESSOR_POINTWISE_CHUNKED 2
-#define LASZIP_COMPRESSOR_TOTAL_NUMBER_OF   3
+#define LASZIP_COMPRESSOR_LAYERED_CHUNKED   3
+#define LASZIP_COMPRESSOR_TOTAL_NUMBER_OF   4
 
 #define LASZIP_COMPRESSOR_CHUNKED LASZIP_COMPRESSOR_POINTWISE_CHUNKED
 #define LASZIP_COMPRESSOR_NOT_CHUNKED LASZIP_COMPRESSOR_POINTWISE
@@ -60,23 +85,17 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_CHUNK_SIZE_DEFAULT           50000
 
-//#endif // LASZIP_ENABLED
-
-#define LASZIP_DLL
-
 class LASitem
 {
 public:
-  enum Type { BYTE = 0, SHORT, INT, LONG, FLOAT, DOUBLE, POINT10, GPSTIME11, RGB12, WAVEPACKET13, POINT14, RGBNIR14 } type;
+  enum Type { BYTE = 0, SHORT, INT, LONG, FLOAT, DOUBLE, POINT10, GPSTIME11, RGB12, WAVEPACKET13, POINT14, RGB14, RGBNIR14, WAVEPACKET14, BYTE14 } type;
   unsigned short size;
   unsigned short version;
   bool is_type(LASitem::Type t) const;
   const char* get_name() const;
 };
 
-//#ifdef LASZIP_ENABLED
-
-class LASZIP_DLL LASzip
+class LASzip
 {
 public:
 
@@ -84,8 +103,8 @@ public:
   bool check_compressor(const unsigned short compressor);
   bool check_coder(const unsigned short coder);
   bool check_item(const LASitem* item);
-  bool check_items(const unsigned short num_items, const LASitem* items);
-  bool check();
+  bool check_items(const unsigned short num_items, const LASitem* items, const unsigned short point_size=0);
+  bool check(const unsigned short point_size=0);
 
   // go back and forth between item array and point type & size
   bool setup(unsigned short* num_items, LASitem** items, const unsigned char point_type, const unsigned short point_size, const unsigned short compressor=LASZIP_COMPRESSOR_NONE);
@@ -98,6 +117,7 @@ public:
   bool pack(unsigned char*& bytes, int& num);
 
   // setup
+  bool request_compatibility_mode(const unsigned short requested_compatibility_mode=0); // 0 = none, 1 = LAS 1.4 compatibility mode
   bool setup(const unsigned char point_type, const unsigned short point_size, const unsigned short compressor=LASZIP_COMPRESSOR_DEFAULT);
   bool setup(const unsigned short num_items, const LASitem* items, const unsigned short compressor);
   bool set_chunk_size(const unsigned int chunk_size);             /* for compressor only */
@@ -126,7 +146,5 @@ private:
   bool return_error(const char* err);
   char* error_string;
 };
-
-//#endif // LASZIP_ENABLED
 
 #endif

@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2005-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -79,15 +79,18 @@ ArithmeticDecoder::ArithmeticDecoder()
   instream = 0;
 }
 
-BOOL ArithmeticDecoder::init(ByteStreamIn* instream)
+BOOL ArithmeticDecoder::init(ByteStreamIn* instream, BOOL really_init)
 {
   if (instream == 0) return FALSE;
   this->instream = instream;
   length = AC__MaxLength;
-  value = (instream->getByte() << 24);
-  value |= (instream->getByte() << 16);
-  value |= (instream->getByte() << 8);
-  value |= (instream->getByte());
+  if (really_init)
+  {
+    value = (instream->getByte() << 24);
+    value |= (instream->getByte() << 16);
+    value |= (instream->getByte() << 8);
+    value |= (instream->getByte());
+  }
   return TRUE;
 }
 
@@ -198,6 +201,8 @@ U32 ArithmeticDecoder::decodeSymbol(ArithmeticModel* m)
   ++m->symbol_count[sym];
   if (--m->symbols_until_update == 0) m->update();    // periodic model update
 
+  assert(sym < m->symbols);
+
   return sym;
 }
 
@@ -207,6 +212,11 @@ U32 ArithmeticDecoder::readBit()
   value -= length * sym;                                    // update interval
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
+
+  if (sym >= 2)
+  {
+    throw 4711;
+  }
 
   return sym;
 }
@@ -228,6 +238,11 @@ U32 ArithmeticDecoder::readBits(U32 bits)
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
+  if (sym >= (1u<<bits))
+  {
+    throw 4711;
+  }
+
   return sym;
 }
 
@@ -238,7 +253,10 @@ U8 ArithmeticDecoder::readByte()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1<<8));
+  if (sym >= (1u<<8))
+  {
+    throw 4711;
+  }
 
   return (U8)sym;
 }
@@ -250,7 +268,10 @@ U16 ArithmeticDecoder::readShort()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1<<16));
+  if (sym >= (1u<<16))
+  {
+    throw 4711;
+  }
 
   return (U16)sym;
 }

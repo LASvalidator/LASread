@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -48,26 +48,6 @@ struct LASpoint10
   I8 scan_angle_rank;
   U8 user_data;
   U16 point_source_ID;
-};
-
-struct LASpoint14
-{
-  I32 X;
-  I32 Y;
-  I32 Z;
-  U16 intensity;
-  U8 return_number : 4;
-  U8 number_of_returns_of_given_pulse : 4;
-  U8 classification_flags : 4;
-  U8 scanner_channel : 2;
-  U8 scan_direction_flag : 1;
-  U8 edge_of_flight_line : 1;
-  U8 classification;
-  U8 user_data;
-  I16 scan_angle;
-  U16 point_source_ID;
-  I8 scan_angle_rank;
-  U8 dummy_for_eight_byte_alignment;
 };
 
 LASreadItemCompressed_POINT10_v2::LASreadItemCompressed_POINT10_v2(ArithmeticDecoder* dec)
@@ -115,7 +95,7 @@ LASreadItemCompressed_POINT10_v2::~LASreadItemCompressed_POINT10_v2()
   delete ic_z;
 }
 
-BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item)
+BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item, U32& context)
 {
   U32 i;
 
@@ -145,26 +125,16 @@ BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item)
   ic_z->initDecompressor();
 
   /* init last item */
-  memcpy(last_item, item, 12);
+  memcpy(last_item, item, 20);
 
   /* but set intensity to zero */ 
   last_item[12] = 0;
   last_item[13] = 0;
 
-  ((LASpoint10*)last_item)->return_number = ((LASpoint14*)item)->return_number;
-  ((LASpoint10*)last_item)->number_of_returns_of_given_pulse = ((LASpoint14*)item)->number_of_returns_of_given_pulse;
-  ((LASpoint10*)last_item)->scan_direction_flag = ((LASpoint14*)item)->scan_direction_flag;
-  ((LASpoint10*)last_item)->edge_of_flight_line = ((LASpoint14*)item)->edge_of_flight_line;
-  ((LASpoint10*)last_item)->classification = (((LASpoint14*)item)->classification_flags << 5) | ((LASpoint14*)item)->classification;
-  ((LASpoint10*)last_item)->user_data = ((LASpoint14*)item)->user_data;
-  ((LASpoint10*)last_item)->scan_angle_rank = ((LASpoint14*)item)->scan_angle_rank;
-  ((LASpoint10*)last_item)->point_source_ID = ((LASpoint14*)item)->point_source_ID;
-  ((LASpoint10*)last_item)->scan_angle_rank = ((LASpoint14*)item)->scan_angle_rank;
-
   return TRUE;
 }
 
-inline void LASreadItemCompressed_POINT10_v2::read(U8* item)
+inline void LASreadItemCompressed_POINT10_v2::read(U8* item, U32& context)
 {
   U32 r, n, m, l;
   U32 k_bits;
@@ -264,18 +234,7 @@ inline void LASreadItemCompressed_POINT10_v2::read(U8* item)
   last_height[l] = ((LASpoint10*)last_item)->z;
 
   // copy the last point
-  memcpy(item, last_item, 14);
-  ((LASpoint14*)item)->return_number = ((LASpoint10*)last_item)->return_number;
-  ((LASpoint14*)item)->number_of_returns_of_given_pulse = ((LASpoint10*)last_item)->number_of_returns_of_given_pulse;
-  ((LASpoint14*)item)->classification_flags = ((LASpoint10*)last_item)->classification >> 5;
-  ((LASpoint14*)item)->scanner_channel = 0;
-  ((LASpoint14*)item)->scan_direction_flag = ((LASpoint10*)last_item)->scan_direction_flag;
-  ((LASpoint14*)item)->edge_of_flight_line = ((LASpoint10*)last_item)->edge_of_flight_line;
-  ((LASpoint14*)item)->classification = ((LASpoint10*)last_item)->classification & 31;
-  ((LASpoint14*)item)->user_data = ((LASpoint10*)last_item)->user_data;
-  ((LASpoint14*)item)->scan_angle = I16_QUANTIZE(166.6666666f * ((LASpoint10*)last_item)->scan_angle_rank);
-  ((LASpoint14*)item)->point_source_ID = ((LASpoint10*)last_item)->point_source_ID;
-  ((LASpoint14*)item)->scan_angle_rank = ((LASpoint10*)last_item)->scan_angle_rank;
+  memcpy(item, last_item, 20);
 }
 
 /*
@@ -309,7 +268,7 @@ LASreadItemCompressed_GPSTIME11_v2::~LASreadItemCompressed_GPSTIME11_v2()
   delete ic_gpstime;
 }
 
-BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item)
+BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item, U32& context)
 {
   /* init state */
   last = 0, next = 0;
@@ -335,7 +294,7 @@ BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
+inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item, U32& context)
 {
   I32 multi;
   if (last_gpstime_diff[last] == 0) // if the last integer difference was zero
@@ -360,7 +319,7 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
     else if (multi > 2) // we switch to another sequence
     {
       last = (last+multi-2)&3;
-      read(item);
+      read(item, context);
     }
   }
   else
@@ -434,7 +393,7 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
     else if (multi >=  LASZIP_GPSTIME_MULTI_CODE_FULL)
     {
       last = (last+multi-LASZIP_GPSTIME_MULTI_CODE_FULL)&3;
-      read(item);
+      read(item, context);
     }
   }
   *((I64*)item) = last_gpstime[last].i64;
@@ -473,7 +432,7 @@ LASreadItemCompressed_RGB12_v2::~LASreadItemCompressed_RGB12_v2()
   dec->destroySymbolModel(m_rgb_diff_5);
 }
 
-BOOL LASreadItemCompressed_RGB12_v2::init(const U8* item)
+BOOL LASreadItemCompressed_RGB12_v2::init(const U8* item, U32& context)
 {
   /* init state */
 
@@ -491,7 +450,7 @@ BOOL LASreadItemCompressed_RGB12_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_RGB12_v2::read(U8* item)
+inline void LASreadItemCompressed_RGB12_v2::read(U8* item, U32& context)
 {
   U8 corr;
   I32 diff = 0;
@@ -603,7 +562,7 @@ LASreadItemCompressed_BYTE_v2::~LASreadItemCompressed_BYTE_v2()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_BYTE_v2::init(const U8* item)
+BOOL LASreadItemCompressed_BYTE_v2::init(const U8* item, U32& context)
 {
   U32 i;
   /* init state */
@@ -619,7 +578,7 @@ BOOL LASreadItemCompressed_BYTE_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_BYTE_v2::read(U8* item)
+inline void LASreadItemCompressed_BYTE_v2::read(U8* item, U32& context)
 {
   U32 i;
   I32 value;

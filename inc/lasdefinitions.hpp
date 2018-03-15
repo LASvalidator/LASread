@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2005-2013, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    15 March 2017 -- read files compressed with "native LAS 1.4 extension" of LASzip 
     27 April 2013 -- adapted from the LASlib library for the ASPRS LASvalidator
   
 ===============================================================================
@@ -32,8 +33,8 @@
 #define LAS_DEFINITIONS_HPP
 
 #define LASREAD_VERSION_MAJOR    1
-#define LASREAD_VERSION_MINOR    0
-#define LASREAD_BUILD_DATE  160119
+#define LASREAD_VERSION_MINOR    1
+#define LASREAD_BUILD_DATE  170315
 
 #include <stdio.h>
 #include <string.h>
