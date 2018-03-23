@@ -50,6 +50,26 @@ struct LASpoint10
   U16 point_source_ID;
 };
 
+struct LASpoint14
+{
+  I32 X;
+  I32 Y;
+  I32 Z;
+  U16 intensity;
+  U8 return_number : 4;
+  U8 number_of_returns_of_given_pulse : 4;
+  U8 classification_flags : 4;
+  U8 scanner_channel : 2;
+  U8 scan_direction_flag : 1;
+  U8 edge_of_flight_line : 1;
+  U8 classification;
+  U8 user_data;
+  I16 scan_angle;
+  U16 point_source_ID;
+  I8 scan_angle_rank;
+  U8 dummy_for_eight_byte_alignment;
+};
+
 LASreadItemCompressed_POINT10_v2::LASreadItemCompressed_POINT10_v2(ArithmeticDecoder* dec)
 {
   U32 i;
@@ -125,11 +145,21 @@ BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item, U32& context)
   ic_z->initDecompressor();
 
   /* init last item */
-  memcpy(last_item, item, 20);
+  memcpy(last_item, item, 12);
 
   /* but set intensity to zero */ 
   last_item[12] = 0;
   last_item[13] = 0;
+
+  ((LASpoint10*)last_item)->return_number = ((LASpoint14*)item)->return_number;
+  ((LASpoint10*)last_item)->number_of_returns_of_given_pulse = ((LASpoint14*)item)->number_of_returns_of_given_pulse;
+  ((LASpoint10*)last_item)->scan_direction_flag = ((LASpoint14*)item)->scan_direction_flag;
+  ((LASpoint10*)last_item)->edge_of_flight_line = ((LASpoint14*)item)->edge_of_flight_line;
+  ((LASpoint10*)last_item)->classification = (((LASpoint14*)item)->classification_flags << 5) | ((LASpoint14*)item)->classification;
+  ((LASpoint10*)last_item)->user_data = ((LASpoint14*)item)->user_data;
+  ((LASpoint10*)last_item)->scan_angle_rank = ((LASpoint14*)item)->scan_angle_rank;
+  ((LASpoint10*)last_item)->point_source_ID = ((LASpoint14*)item)->point_source_ID;
+  ((LASpoint10*)last_item)->scan_angle_rank = ((LASpoint14*)item)->scan_angle_rank;
 
   return TRUE;
 }
@@ -234,7 +264,18 @@ inline void LASreadItemCompressed_POINT10_v2::read(U8* item, U32& context)
   last_height[l] = ((LASpoint10*)last_item)->z;
 
   // copy the last point
-  memcpy(item, last_item, 20);
+  memcpy(item, last_item, 14);
+  ((LASpoint14*)item)->return_number = ((LASpoint10*)last_item)->return_number;
+  ((LASpoint14*)item)->number_of_returns_of_given_pulse = ((LASpoint10*)last_item)->number_of_returns_of_given_pulse;
+  ((LASpoint14*)item)->classification_flags = ((LASpoint10*)last_item)->classification >> 5;
+  ((LASpoint14*)item)->scanner_channel = 0;
+  ((LASpoint14*)item)->scan_direction_flag = ((LASpoint10*)last_item)->scan_direction_flag;
+  ((LASpoint14*)item)->edge_of_flight_line = ((LASpoint10*)last_item)->edge_of_flight_line;
+  ((LASpoint14*)item)->classification = ((LASpoint10*)last_item)->classification & 31;
+  ((LASpoint14*)item)->user_data = ((LASpoint10*)last_item)->user_data;
+  ((LASpoint14*)item)->scan_angle = I16_QUANTIZE(166.6666666f * ((LASpoint10*)last_item)->scan_angle_rank);
+  ((LASpoint14*)item)->point_source_ID = ((LASpoint10*)last_item)->point_source_ID;
+  ((LASpoint14*)item)->scan_angle_rank = ((LASpoint10*)last_item)->scan_angle_rank;
 }
 
 /*
