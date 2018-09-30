@@ -90,6 +90,7 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
     case LASitem::RGBNIR14:
       have_nir = TRUE;
     case LASitem::RGB12:
+    case LASitem::RGB14:
       have_rgb = TRUE;
       point[i] = (U8*)rgbi;
       break;
