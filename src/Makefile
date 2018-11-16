@@ -8,7 +8,7 @@ AR  = ar rc
 
 INCLUDE  = -I/usr/include/ -I../inc -I.
 
-OBJ = lasheader.o laspoint.o lasreader.o lasreadopener.o laswaveformreader.o lasutility.o laszip.o lasreadpoint.o lasreaditemcompressed_v1.o lasreaditemcompressed_v2.o integerdecompressor.o arithmeticdecoder.o arithmeticmodel.o
+OBJ = lasheader.o laspoint.o lasreader.o lasreadopener.o laswaveformreader.o lasutility.o laszip.o lasreadpoint.o lasreaditemcompressed_v1.o lasreaditemcompressed_v2.o lasreaditemcompressed_v3.o lasreaditemcompressed_v4.o integerdecompressor.o arithmeticdecoder.o arithmeticmodel.o
 
 all: liblasread.a
 
@@ -19,7 +19,7 @@ liblasread.a: ${OBJ}
 .cpp.o:
 	${COMPILER} ${BITS} -c ${COPTS} ${INCLUDE} $< -o $@
 
-.c.o: 
+.c.o:
 	${COMPILER} ${BITS} -c ${COPTS} ${INCLUDE} $< -o $@
 
 clean:
