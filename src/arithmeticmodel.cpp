@@ -5,7 +5,8 @@
   
   CONTENTS:
       
-    see corresponding header file
+    A modular C++ wrapper for an adapted version of Amir Said's FastAC Code.
+    see: http://www.cipr.rpi.edu/~said/FastAC.html
 
   PROGRAMMERS:
 
@@ -13,11 +14,11 @@
 
   COPYRIGHT:
 
-    (c) 2005-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2005-2014, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
-    Foundation. See the COPYING.txt file for more information.
+    Foundation. See the COPYING file for more information.
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

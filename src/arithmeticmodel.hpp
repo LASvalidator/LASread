@@ -14,23 +14,26 @@
 
   COPYRIGHT:
 
-    (c) 2005-2013, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
-    Foundation. See the COPYING.txt file for more information.
+    Foundation. See the COPYING file for more information.
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
   
-    27 April 2013 -- adapted from the LASzip library for the ASPRS LASvalidator
+    11 April 2019 -- 1024 AC_BUFFER_SIZE to 4096 for propagate_carry() overflow
+    10 January 2011 -- licensing change for LGPL release and liblas integration
+    8 December 2010 -- unified framework for all entropy coders
+    30 October 2009 -- refactoring Amir Said's FastAC code
   
 ===============================================================================
 */
-#ifndef ARITHMETIC_MODEL_H
-#define ARITHMETIC_MODEL_H
+#ifndef ARITHMETIC_MODEL_HPP
+#define ARITHMETIC_MODEL_HPP
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +42,7 @@
 
 /* this header byte needs to change in case incompatible change happen */
 #define AC_HEADER_BYTE 2
-#define AC_BUFFER_SIZE 1024
+#define AC_BUFFER_SIZE 4096
 
 const U32 AC__MinLength = 0x01000000U;   // threshold for renormalization
 const U32 AC__MaxLength = 0xFFFFFFFFU;      // maximum AC interval length
