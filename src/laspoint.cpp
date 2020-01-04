@@ -95,10 +95,12 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U8 point_type, const U1
       point[i] = (U8*)rgbi;
       break;
     case LASitem::WAVEPACKET13:
+    case LASitem::WAVEPACKET14:
       have_wave_packet = TRUE;
       point[i] = (U8*)&wave_packet;
       break;
     case LASitem::BYTE:
+    case LASitem::BYTE14:
       number_of_extra_bytes = items[i].size;
       extra_bytes = new U8[number_of_extra_bytes];
       if (extra_bytes == 0)
@@ -203,14 +205,17 @@ BOOL LASpoint::init(const LASquantizer* quantizer, const U32 num_items, const LA
     case LASitem::RGBNIR14:
       have_nir = TRUE;
     case LASitem::RGB12:
+    case LASitem::RGB14:
       have_rgb = TRUE;
       this->point[i] = (U8*)(this->rgbi);
       break;
     case LASitem::WAVEPACKET13:
+    case LASitem::WAVEPACKET14:
       have_wave_packet = TRUE;
       this->point[i] = (U8*)&(this->wave_packet);
       break;
     case LASitem::BYTE:
+    case LASitem::BYTE14:
       number_of_extra_bytes = items[i].size;
       extra_bytes = new U8[number_of_extra_bytes];
       if (extra_bytes == 0)
