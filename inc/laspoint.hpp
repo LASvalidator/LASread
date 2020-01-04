@@ -149,7 +149,7 @@ protected:
   U8 return_number : 4;
   U8 number_of_returns_of_given_pulse : 4;
   U8 classification_flags : 4;
-  U8 scanner_channel : 2;
+  U8 scanner_channel : 2;  // LAS 1.4, point types 6 - 10 only
   U8 scan_direction_flag : 1;
   U8 edge_of_flight_line : 1;
   U8 classification;
@@ -157,7 +157,8 @@ protected:
   I16 scan_angle;
   U16 point_source_ID;
   I8 scan_angle_rank;
-  U8 dummy_for_eight_byte_alignment;
+
+  U8 gps_time_change;      // LAS 1.4, point types 6 - 10 only
 
   F64 gps_time;
 
