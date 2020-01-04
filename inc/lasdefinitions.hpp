@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2020, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -34,7 +34,7 @@
 
 #define LASREAD_VERSION_MAJOR    1
 #define LASREAD_VERSION_MINOR    1
-#define LASREAD_BUILD_DATE  180930
+#define LASREAD_BUILD_DATE  200104
 
 #include <stdio.h>
 #include <string.h>
