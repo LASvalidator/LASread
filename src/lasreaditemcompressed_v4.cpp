@@ -40,37 +40,21 @@ typedef struct LASpoint14
   I32 Y;
   I32 Z;
   U16 intensity;
-  U8 legacy_return_number : 3;
-  U8 legacy_number_of_returns : 3;
-  U8 scan_direction_flag : 1;
-  U8 edge_of_flight_line : 1;
-  U8 legacy_classification : 5;
-  U8 legacy_flags : 3;
-  I8 legacy_scan_angle_rank;
-  U8 user_data;
-  U16 point_source_ID;
-
-  // LAS 1.4 only
-  I16 scan_angle;
-  U8 legacy_point_type : 2;
-  U8 scanner_channel : 2;
-  U8 classification_flags : 4;
-  U8 classification;
   U8 return_number : 4;
   U8 number_of_returns : 4;
+  U8 classification_flags : 4;
+  U8 scanner_channel : 2;  // LAS 1.4, point types 6 - 10 only
+  U8 scan_direction_flag : 1;
+  U8 edge_of_flight_line : 1;
+  U8 classification;
+  U8 user_data;
+  I16 scan_angle;
+  U16 point_source_ID;
+  I8 scan_angle_rank;
 
-  // LASlib internal use only
-  U8 deleted_flag;
-
-  // for 8 byte alignment of the GPS time
-  U8 dummy[2];
-
-  // compressed LASzip 1.4 points only
-  BOOL gps_time_change;
+  U8 gps_time_change;      // LAS 1.4, point types 6 - 10 only
 
   F64 gps_time;
-  U16 rgb[4];
-//  LASwavepacket wavepacket;
 } LASpoint14;
 
 #define LASZIP_GPSTIME_MULTI 500
@@ -814,33 +798,6 @@ inline void LASreadItemCompressed_POINT14_v4::read(U8* item, U32& context)
     ((LASpoint14*)last_item)->return_number = r;
   }
 
-  // set legacy return counts and number of returns
-
-  if (n > 7)
-  {
-    if (r > 6)
-    {
-      if (r >= n)
-      {
-        ((LASpoint14*)last_item)->legacy_return_number = 7;
-      }
-      else
-      {
-        ((LASpoint14*)last_item)->legacy_return_number = 6;
-      }
-    }
-    else
-    {
-      ((LASpoint14*)last_item)->legacy_return_number = r;
-    }
-    ((LASpoint14*)last_item)->legacy_number_of_returns = 7;
-  }
-  else
-  {
-    ((LASpoint14*)last_item)->legacy_return_number = r;
-    ((LASpoint14*)last_item)->legacy_number_of_returns = n;
-  }
-
   // get return map m and return level l context for current point
 
   U32 m = number_return_map_6ctx[n][r];
@@ -892,16 +849,6 @@ inline void LASreadItemCompressed_POINT14_v4::read(U8* item, U32& context)
       dec_classification->initSymbolModel(contexts[current_context].m_classification[ccc]);
     }
     ((LASpoint14*)last_item)->classification = dec_classification->decodeSymbol(contexts[current_context].m_classification[ccc]);
-
-    // update the legacy copy
-    if (((LASpoint14*)last_item)->classification < 32)
-    {
-      ((LASpoint14*)last_item)->legacy_classification = ((LASpoint14*)last_item)->classification;
-    }
-    else
-    {
-      ((LASpoint14*)last_item)->legacy_classification = 0;
-    }
   }
 
   ////////////////////////////////////////
@@ -920,9 +867,6 @@ inline void LASreadItemCompressed_POINT14_v4::read(U8* item, U32& context)
     ((LASpoint14*)last_item)->edge_of_flight_line = !!(flags & (1 << 5));
     ((LASpoint14*)last_item)->scan_direction_flag = !!(flags & (1 << 4));
     ((LASpoint14*)last_item)->classification_flags = (flags & 0x0F);
-
-    // legacy copies
-    ((LASpoint14*)last_item)->legacy_flags = (flags & 0x07);
   }
 
   ////////////////////////////////////////
@@ -945,7 +889,6 @@ inline void LASreadItemCompressed_POINT14_v4::read(U8* item, U32& context)
     if (scan_angle_change) // if the scan angle has actually changed
     {
       ((LASpoint14*)last_item)->scan_angle = contexts[current_context].ic_scan_angle->decompress(((LASpoint14*)last_item)->scan_angle, gps_time_change); // if the GPS time has changed
-      ((LASpoint14*)last_item)->legacy_scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f*((LASpoint14*)last_item)->scan_angle));
     }
   }
 
