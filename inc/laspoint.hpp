@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
   
+     4 January 2020 -- bug fix for LAS 1.4 points with extra bytes (point types 6-10)
     30 September 2018 -- bug fix for LAS 1.4 points with RGB color (point type 7)
      5 September 2015 -- fixed alignment bug for GPS time for new LAS 1.4 points
     27 April 2013 -- adapted from the LASzip library for the ASPRS LASvalidator
