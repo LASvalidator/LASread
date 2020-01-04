@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2020, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,11 +25,14 @@
   CHANGE HISTORY:
   
     22 April 2013 -- adapted from the LASzip library for the ASPRS LASvalidator
+     1 October 2011 -- added 64 bit file support in MSVC 6.0 at McCafe at Hbf Linz
+    10 January 2011 -- licensing change for LGPL release and liblas integration
+    12 December 2010 -- created from ByteStreamOutFile after Howard got pushy (-;
   
 ===============================================================================
 */
-#ifndef LASLIBRARY_BYTE_STREAM_IN_FILE_HPP
-#define LASLIBRARY_BYTE_STREAM_IN_FILE_HPP
+#ifndef BYTE_STREAM_IN_FILE_HPP
+#define BYTE_STREAM_IN_FILE_HPP
 
 #include "bytestreamin.hpp"
 
@@ -132,8 +135,10 @@ inline BOOL ByteStreamInFile::isSeekable() const
 
 inline I64 ByteStreamInFile::tell() const
 {
-#ifdef _WIN32
+#if defined _WIN32 && ! defined (__MINGW32__)
   return _ftelli64(file);
+#elif defined (__MINGW32__)
+  return (I64)ftello64(file);
 #else
   return (I64)ftello(file);
 #endif
@@ -143,8 +148,10 @@ inline BOOL ByteStreamInFile::seek(const I64 position)
 {
   if (tell() != position)
   {
-#ifdef _WIN32
+#if defined _WIN32 && ! defined (__MINGW32__)
     return !(_fseeki64(file, position, SEEK_SET));
+#elif defined (__MINGW32__)
+    return !(fseeko64(file, (off_t)position, SEEK_SET));
 #else
     return !(fseeko(file, (off_t)position, SEEK_SET));
 #endif
@@ -154,8 +161,10 @@ inline BOOL ByteStreamInFile::seek(const I64 position)
 
 inline BOOL ByteStreamInFile::seekEnd(const I64 distance)
 {
-#ifdef _WIN32
+#if defined _WIN32 && ! defined (__MINGW32__)
   return !(_fseeki64(file, -distance, SEEK_END));
+#elif defined (__MINGW32__)
+  return !(fseeko64(file, (off_t)-distance, SEEK_END));
 #else
   return !(fseeko(file, (off_t)-distance, SEEK_END));
 #endif
