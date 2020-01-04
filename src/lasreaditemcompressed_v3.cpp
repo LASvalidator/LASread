@@ -59,7 +59,13 @@ typedef struct LASpoint14
   U8 return_number : 4;
   U8 number_of_returns : 4;
 
-  U8 dummy[3]; // for 8 byte alignment of the GPS time
+  // LASlib internal use only
+  U8 deleted_flag;
+
+  // for 8 byte alignment of the GPS time
+  U8 dummy[2];
+
+  // compressed LASzip 1.4 points only
   BOOL gps_time_change;
 
   F64 gps_time;
@@ -887,10 +893,14 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item, U32& context)
     }
     ((LASpoint14*)last_item)->classification = dec_classification->decodeSymbol(contexts[current_context].m_classification[ccc]);
 
-    // legacy copies
+    // update the legacy copy
     if (((LASpoint14*)last_item)->classification < 32)
     {
       ((LASpoint14*)last_item)->legacy_classification = ((LASpoint14*)last_item)->classification;
+    }
+    else
+    {
+      ((LASpoint14*)last_item)->legacy_classification = 0;
     }
   }
 
@@ -1691,7 +1701,7 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item, U32& context)
     }
   }
 
-  // dempress
+  // decompress
 
   ////////////////////////////////////////
   // decompress RGB layer 
@@ -1801,11 +1811,11 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item, U32& context)
     {
       ((U16*)item)[3] |= (last_item[3]&0xFF00);
     }
-    contexts[current_context].last_item[3] = ((U16*)item)[3];
+    last_item[3] = ((U16*)item)[3];
   }
   else
   {
-    ((U16*)item)[3] = contexts[current_context].last_item[3];
+    ((U16*)item)[3] = last_item[3];
   }
 }
 
@@ -2123,7 +2133,14 @@ LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecod
 
     changed_Bytes[i] = FALSE;
 
-    requested_Bytes[i] = (decompress_selective & (LASZIP_DECOMPRESS_SELECTIVE_BYTE0 << i) ? TRUE : FALSE);
+    if (i > 15) // currently only the first 16 extra bytes can be selectively decompressed
+    {
+      requested_Bytes[i] = TRUE;
+    }
+    else
+    {
+      requested_Bytes[i] = (decompress_selective & (LASZIP_DECOMPRESS_SELECTIVE_BYTE0 << i) ? TRUE : FALSE);
+    }
   }
 
   /* init the bytes buffer to zero */
