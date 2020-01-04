@@ -304,7 +304,7 @@ void LASpoint::zero()
   number_of_returns_of_given_pulse = 1;
   return_number = 1;
   classification_flags = 0;
-  scanner_channel = 0;
+  scanner_channel = 0;          // LAS 1.4, point types 6 - 10 only
   edge_of_flight_line = 0;
   scan_direction_flag = 0;
   classification = 0;
@@ -312,7 +312,7 @@ void LASpoint::zero()
   scan_angle = 0;
   point_source_ID = 0;
   scan_angle_rank = 0;
-  dummy_for_eight_byte_alignment = 0;
+  gps_time_change = 0;          // LAS 1.4, point types 6 - 10 only
   gps_time = 0.0;
   rgbi[0] = rgbi[1] = rgbi[2] = rgbi[3] = 0;
   wave_packet.zero();
